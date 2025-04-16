@@ -1,8 +1,15 @@
 ```mermaid
 graph LR;
+
+subgraph allUsers
+KA[user_id]
+KB[user_email]
+KC[user_password]
+KD[user_type]
+end
+
 subgraph Patients
-A[patient_id INT 
-AUTO_INCRIMENT PK]
+A[patient_id INT PK]
 B[username]
 D[nimi]
 E[sukunimi]
@@ -32,11 +39,10 @@ end
 
 subgraph Doctors
 U[doc_id]
-V[doc_username]
+V[doc_email]
 W[doc_pass]
 X[doc_name]
 Y[doc_surname]
-Z[doc_email]
 ZA[doc_puhelin]
 ZB[doc_date]
 ZC[doc_henkilotunnus]
@@ -56,3 +62,7 @@ end
 M -->|FK| A
 S -->|FK| A
 HB --> U
+
+A --> KA
+U --> KA
+SA --> KA

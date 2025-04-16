@@ -8,6 +8,9 @@ export default defineConfig({
       input: {
         // List your html files here, e.g:
         main: resolve(__dirname, 'index.html'),
+        admin: resolve(__dirname, 'src/pages/admin.html'),
+        doctor: resolve(__dirname, 'src/pages/doc.html'),
+        patient: resolve(__dirname, 'src/pages/patient.html'),
         //home: resolve(__dirname, 'home.html'),
       },
     },
