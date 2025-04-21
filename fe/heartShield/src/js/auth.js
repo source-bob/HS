@@ -29,7 +29,6 @@ const loginUser = async (event) => {
         },
     };
     console.log(options);
-    console.log('MOOOOOI');
     // Hae data
     const response = await fetchData(url, options);
 

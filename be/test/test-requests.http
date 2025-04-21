@@ -5,3 +5,26 @@ Content-Type: application/json
     "user_email": "adalovelace@example.com",
     "user_password": "adminpass"
 }
+
+###
+
+GET http://localhost:3000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODQwLCJ1c2VyX2VtYWlsIjoiYWRhbG92ZWxhY2VAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJhZG0iLCJpYXQiOjE3NDQ4MzgzMTksImV4cCI6MTc0NDkyNDcxOX0.Wpb6uwkIpT0qmIVScBqhMDGUbDV9P5lr4Pejvs63sb4
+
+###
+
+POST http://localhost:3000/api/auth/login/
+Content-Type: application/json
+
+{
+    "user_email": "walterfreeman@example.com",
+    "user_password": "docpass"
+}
+
+###
+GET http://localhost:3000/api/users/1936
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOTM2LCJ1c2VyX2VtYWlsIjoid2FsdGVyZnJlZW1hbkBleGFtcGxlLmNvbSIsInVzZXJfdHlwZSI6ImRvYyIsImlhdCI6MTc0NDgzODQ2NSwiZXhwIjoxNzQ0OTI0ODY1fQ.WqZV7tUdtM8P1UALoSAvCiM29wVBMw8wrDId7Iqsry0
+
+###
+GET http://localhost:3000/api/users/adm/1840
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODQwLCJ1c2VyX2VtYWlsIjoiYWRhbG92ZWxhY2VAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJhZG0iLCJpYXQiOjE3NDQ5NzI0OTksImV4cCI6MTc0NTA1ODg5OX0.jbLfS80nJdivDmUhbVG-hCu5XYENAzxkzmJBu-1CdFA

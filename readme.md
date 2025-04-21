@@ -1,1 +1,2 @@
 heartShield pohja
+Lisätty sivujen perus rakenteet

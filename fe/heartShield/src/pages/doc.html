@@ -6,6 +6,35 @@
     <title>Document</title>
 </head>
 <body>
-    DOCS PAGE
+    <div class="main-block">
+        <div id="user-block">
+            <div class="page-header">
+                <div class="header-logo">
+                    <img id="mini-logo" src="../img/logomini.png" alt="logo-mini" />
+                </div>
+                <div class="header-header">Doctor Dashboard</div>
+                <div class="header-logout">
+                    <button id="logout">logout</button>
+                </div>
+            </div>
+            <div class="main-info">
+                <div class="main-info-block" id="main-info-name-block">
+                    <div class="main-info-name-part" id="main-info-status-value"></div>
+                    <div class="main-info-name-part" id="main-info-name-value"></div>
+                </div>
+                <div class="main-info-block" id="main-info-id-block">
+                    <div class="main-info-id-part" id="main-info-id-header">ID:</div>
+                    <div class="main-info-id-part" id="main-info-id-value"></div>
+                </div>
+            </div>
+            <div class="doc-buttons">
+                <button class="doc-button">Luo uusi potilas</button>
+                <button class="doc-button">Poista potilas</button>
+            </div>
+            <div id="doc-patients"></div>
+        </div>
+    </div>
 </body>
+<script type="module" src="/src/js/main.js"></script>
+<script type="module" src="/src/js/doc.js"></script>
 </html>

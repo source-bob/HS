@@ -1,49 +1,3 @@
-#admin-block {
-    width: 90%;
-    height: 90%;
-    border: 5px solid black;
-    margin: auto;
-    box-sizing: border-box;
-    background-color: grey;
-    display: flex;
-    flex-direction: column;
-    padding: 2%;
-}
-
-.page-header {
-    width: 100%;
-    height: 10%;
-    background-color: aqua;
-    color: black;
-    display: flex;
-}
-
-.header-logo {
-    width: 10%;
-    height: 100%;
-    background-color: brown;
-}
-
-.header-header {
-    width: 75%;
-    height: 100%;
-    background-color: blueviolet;
-    
-    font-size: 200%;
-}
-
-.header-logout {
-    width: 15%;
-    height: 100%;
-    background-color: chocolate;
-}
-
-.main-info {
-    width: 100%;
-    height: 7%;
-    background-color: blue;
-}
-
 .user-panel {
     width: 100%;
     height: 83%;
@@ -59,20 +13,160 @@
     flex-direction: column;
 }
 
+.top-part {
+    width: 100%;
+    height: 70%;
+    background-color: green;
+    padding: 2.5%;
+    box-sizing: border-box;
+}
+
+.top-part-part {
+    width: 100%;
+    height: 48.75%;
+    background-color: aqua;
+    box-sizing: border-box;
+}
+
+.top-part-part:last-child {
+    margin-top: 2.5%;
+}
+
+.top-part-part-header {
+    width: 100%;
+    height: 16%;
+    background-color: blue;
+}
+
+.top-part-part-data {
+    width: 100%;
+    height: 84%;
+    background-color: violet;
+}
+
+.top-part-data-row {
+    width: 95%;
+    height: calc(100% / 3);
+    background-color: bisque;
+    box-sizing: border-box;
+    float: right;
+    display: flex;
+    align-items: center;
+}
+
+.top-part-row-header {
+    background-color: blueviolet;
+}
+
+.top-part-row-value {
+    background-color: orange;
+    margin-left: 2%;
+}
+
+.bot-part {
+    width: 95%;
+    height: 30%;
+    background-color: yellowgreen;
+    display: flex;
+    flex-direction: column;
+    margin: 2.5%;
+    box-sizing: border-box;
+}
+
+#bot-part-header {
+    font-size: 150%;
+}
+
+.hallinta-button {
+    width: 95%;
+    height: 25%;
+    margin: 2.5%;
+}
+
 .right-part {
     width: 50%;
     height: 100%;
     background-color: pink;
+    box-sizing: border-box;
+    padding: 1.25% 0 0 1.25%;
 }
 
-.top-part {
-    width: 100%;
-    height: 50%;
-    background-color: green;
+#list-of-users {
+    width: 97.5%;
+    height: 100%;
+    border: 3px solid black;
+    box-sizing: border-box;
+    background-color: #7F7F7F;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 1%;
 }
 
-.bot-part {
+.adm-user-block {
+    width: 90%;
+    height: 20%;
+    background-color: #3D3D3D;
+    margin: 2%;
+    border-radius: 1%;
+    font-size: clamp(10px, 1.75vh, 20px);
+    padding: 2%;
+    box-sizing: border-box;
+    color: white;
+    border: 1px solid white;
+}
+
+.status-name-block {
     width: 100%;
-    height: 50%;
-    background-color: yellowgreen;
+    height: 30%;
+    display: flex;
+}
+
+.user-id-block {
+    width: 100%;
+    height: 30%;
+    display: flex;
+}
+
+.del-button-block {
+    width: 100%;
+    height: 40%;
+    box-sizing: border-box;
+}
+
+.status-piece {
+    width: 20%;
+    height: 100%;
+    margin-left: 5%;
+    text-align: right;
+}
+
+.name-piece {
+    height: 100%;
+    margin-left: 2%;
+}
+
+.second-name-piece {
+    margin-left: 2%;
+    width: 45%;
+    height: 100%;
+}
+
+.user-id-header {
+    width: 20%;
+    height: 100%;
+    text-align: right;
+    margin-left: 5%;
+}
+
+.user-id-value {
+    width: 73%;
+    height: 100%;
+    margin-left: 2%;
+}
+
+.del-user-button {
+    width: 90%;
+    height: 100%;
+    margin-left: 5%;
+    font-size: clamp(10px, 1.75vh, 20px);
 }

@@ -1,0 +1,112 @@
+.patient-info {
+    width: 100%;
+    height: calc(80% / 3);
+    display: flex;
+    background-color: brown;
+    box-sizing: border-box;
+    padding: 3%;
+}
+
+.patient-info-main {
+    width: 50%;
+    height: 100%;
+    background-color: darkmagenta;
+}
+
+.patient-info-main-block {
+    width: 100%;
+    height: calc(100% / 3);
+    background-color: darkred;
+    border: 1px solid black;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.patient-info-main-header {
+    background-color: blueviolet;
+}
+
+.patient-info-main-value {
+    min-width: 65%;
+    max-width: 98%;
+    margin-left: 2%;
+    background-color: chocolate;
+}
+
+.patient-buttons {
+    width: 100%;
+    height: calc(80% / 3);
+    background-color: darkblue;
+    padding: 3%;
+    box-sizing: border-box;
+}
+
+.patient-buttons-row {
+    width: 100%;
+    height: 50%;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: space-between;
+}
+
+.patient-buttons-row:last-child {
+    background-color: blueviolet;
+    align-items: end;
+}
+
+.patient-buttons-top {
+    width: 100%;
+    height: 85%;
+}
+
+.patient-buttons-bottom {
+    width: 31.3%;
+    height: 85%;
+}
+
+.patient-ai {
+    width: 100%;
+    height: calc(80% / 3);
+    background-color: burlywood;
+    padding: 3%;
+    box-sizing: border-box;
+}
+
+.patient-ai-header {
+    width: 100%;
+    height: 20%;
+    background-color: aqua;
+}
+
+.patient-ai-body {
+    width: 100%;
+    height: 80%;
+    background-color: brown;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#patient-ai-text {
+    box-sizing: border-box;
+    background-color: aquamarine;
+    margin: auto;
+    max-width: 100%;
+    max-height: 100%
+}
+
+.patient-alarm {
+    width: 100%;
+    height: 10%;
+    padding-left: 3%;
+    padding-right: 3%;
+    box-sizing: border-box;
+    background-color: brown;
+}
+
+#patient-alarm-button {
+    width: 100%;
+    height: 100%;
+    background-color: #880015;
+}
