@@ -1,5 +1,5 @@
 import { fetchData } from './fetch.js';
-import { createMessage } from './posts.js';
+import { createMessage } from './mods.js';
 
 const loginUser = async (event) => {
     event.preventDefault();

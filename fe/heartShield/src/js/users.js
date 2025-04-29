@@ -1,4 +1,5 @@
 import { fetchData } from "./fetch";
+import { createMod } from "./mods";
 
 const getUsers = async () => {
 
@@ -266,14 +267,27 @@ const getAge = (dateString) => {
 };
 
 const addEventListenersPatient = async () => {
-    const mittariButton = document.querySelector('#patient-buttons-mittari');
+    const buttonHrv = document.querySelector('#patient-buttons-hrv');
+    const buttonHistoria = document.querySelector('#patient-buttons-historia');
+    const buttonMittari = document.querySelector('#patient-buttons-mittari');
+    const buttonSuosituksia = document.querySelector('#patient-buttons-suosituksia');
+    const buttonAlarm = document.querySelector('#patient-alarm-button');
 
-    mittariButton.addEventListener('click', async () => {
-        const modal = document.querySelector('#main-dialog');
-       
-        modal.show();
+    buttonHrv.addEventListener('click', () => {
+        createMod(1);
     });
-
+    buttonHistoria.addEventListener('click', () => {
+        createMod(2);
+    });
+    buttonMittari.addEventListener('click', () => {
+        createMod(3);
+    });
+    buttonSuosituksia.addEventListener('click', () => {
+        createMod(4);
+    });
+    buttonAlarm.addEventListener('click', () => {
+        createMod(5);
+    });
 };
   
 

@@ -110,3 +110,54 @@
     height: 100%;
     background-color: #880015;
 }
+
+.hrv-kaavio-row {
+    width: 100%;
+    background-color: green;
+    display: flex;
+}
+
+.hrv-kaavio-row-header {
+    width: 35%;
+    background-color: #880015;
+}
+
+.hrv-kaavio-row-graph {
+    flex-grow: 1;
+    height: 100%;
+    border: 2px solid black;
+    background-color: blue;
+    position: relative;
+}
+
+.kaavio-graph {
+    height: 100%;
+    width: 0; /* будет меняться через JS */
+    background-color: pink; /* цвет заполнения */
+    transition: width 0.5s ease; /* плавная анимация изменения ширины */
+    border-radius: 10px 0 0 10px; /* скруглённый левый край */
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.hrv-kaavio-row-value {
+    width: 20%;
+    background-color: blueviolet;
+    text-align: center;
+}
+
+#dia-mittari-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#dia-mittari-status-block {
+    display: flex;
+}
+
+#dia-mittari-status {
+    margin-left: 2%;
+    background-color: #3D3D3D;
+}

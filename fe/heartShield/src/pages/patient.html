@@ -49,12 +49,12 @@
             </div>
             <div class="patient-buttons">
                 <div class="patient-buttons-row">
-                    <button class="patient-buttons-top">Näytä HRV-kaavio yksityiskohtaisesti</button>
+                    <button class="patient-buttons-top" id="patient-buttons-hrv">Näytä HRV-kaavio yksityiskohtaisesti</button>
                 </div>
                 <div class="patient-buttons-row">
-                    <button class="patient-buttons-bottom">Katso mittaushistoria</button>
+                    <button class="patient-buttons-bottom" id="patient-buttons-historia">Katso mittaushistoria</button>
                     <button class="patient-buttons-bottom" id="patient-buttons-mittari">Mittari</button>
-                    <button class="patient-buttons-bottom">Lääkärin suositukset</button>
+                    <button class="patient-buttons-bottom" id="patient-buttons-suosituksia">Lääkärin suositukset</button>
                 </div>
             </div>
             <div class="patient-ai">
@@ -69,9 +69,12 @@
         </div>
     </div>
     <dialog id="main-dialog">
-        <div class="dialog-content">
-          <p>Содержимое модального окна</p>
-          <button onclick="document.getElementById('main-dialog').close()">Закрыть</button>
+        <div id="dia-body">
+            <div id="dia-header">
+                <div id="dia-header-value"></div>
+                <button id="close-dialog-button">Close</button>
+            </div>
+            <div id="dia-main-block"></div>
         </div>
     </dialog>
 </body>
