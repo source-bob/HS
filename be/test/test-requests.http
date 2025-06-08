@@ -17,8 +17,8 @@ POST http://localhost:3000/api/auth/login/
 Content-Type: application/json
 
 {
-    "user_email": "walterfreeman@example.com",
-    "user_password": "docpass"
+    "user_email": "johnnash@example.com",
+    "user_password": "potpass"
 }
 
 ###
@@ -28,3 +28,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOTM2L
 ###
 GET http://localhost:3000/api/users/adm/1840
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODQwLCJ1c2VyX2VtYWlsIjoiYWRhbG92ZWxhY2VAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJhZG0iLCJpYXQiOjE3NDQ5NzI0OTksImV4cCI6MTc0NTA1ODg5OX0.jbLfS80nJdivDmUhbVG-hCu5XYENAzxkzmJBu-1CdFA
+
+###
+POST http://localhost:3000/api/ai
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOTU5LCJ1c2VyX2VtYWlsIjoiam9obm5hc2hAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJwb3QiLCJpYXQiOjE3NDY2MjE4NTYsImV4cCI6MTc0NjcwODI1Nn0.K785XeMEfon-uMKLfeirE5L3xjeJA38Xgpb9_OacYxg
+Content-Type: application/json
+
+{
+    "prompt": ''
+}
+
+const aiTest = () => {};

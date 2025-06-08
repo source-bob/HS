@@ -1,12 +1,17 @@
 import HRVState from './hrvState.js';
+import { fetchData } from './fetch.js';
+import { createMod } from './mods.js';
 
+let lastAIRequestTimestamp = 0;
 let lastSaveTimestamp = 0;
-const SAVE_INTERVAL_MS = 60 * 60 * 1000; // 1 час
+const SAVE_INTERVAL_MS = 60 * 1000; // 1 час
+const AI_REQUEST_COOLDOWN_MS = 30 * 60 * 1000; // 10 минут
 
 async function monitorHRVStatus() {
     setInterval(async () => {
         const currentStatus = HRVState.getHRVStatus();
         const currentMetrics = HRVState.getRRMetrics();
+        const currentHeartRate = HRVState.getHeartRate();
 
         if (!currentStatus || !currentMetrics) {
             console.warn('Нет данных для анализа HRV.');
@@ -14,60 +19,162 @@ async function monitorHRVStatus() {
         }
 
         const now = Date.now();
+        const userId = parseInt(localStorage.getItem('user_id'));
+        const userAge = localStorage.getItem('pat_age');
 
         if (currentStatus === "Normaali HRV") {
             if (now - lastSaveTimestamp >= SAVE_INTERVAL_MS) {
-                await saveMetricsToDatabase(currentMetrics);
+                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate);
                 lastSaveTimestamp = now;
             }
+        } else if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS) {
+            console.log('SENDING METRICS TO AI, STEP 1');
+            await sendMetricsToAI(currentMetrics, userId, userAge);
+            lastAIRequestTimestamp = now;
         } else {
-            await sendMetricsToAI(currentMetrics, currentStatus);
+            console.log('AI Cooldown');
         }
     }, 5000); // проверяем каждые 5 секунд
 };
 
-async function saveMetricsToDatabase(metrics) {
+async function saveMetricsToDatabase(userId, metrics, hr) {
     // Здесь заглушка вместо реальной базы
     console.log('💾 Сохраняем метрики в базу данных:', metrics);
-    // TODO: Здесь можно подключить IndexedDB или API сервера
-}
+    metrics.hr = hr;
 
-async function sendMetricsToAI(metrics, status) {
-    const prompt = generatePrompt(metrics, status);
+    const url = `http://localhost:3000/api/metrics/${userId}/`;
+    const options = {
+        body: JSON.stringify(metrics),
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-type': 'application/json',
+        },
+    };
+
+    await fetchData(url, options);
+    // TODO: Здесь можно подключить IndexedDB или API сервера
+};
+
+async function sendMetricsToAI(metrics, userID, age) {
 
     try {
-        const response = await fetch('https://your-ai-endpoint.com/analyze', {
+        const url = 'http://localhost:3000/api/ai';
+        const options = {
+            body: JSON.stringify({
+                user_id: userID,
+                metrics: metrics,
+                user_age: age,
+                hr: HRVState.getHeartRate(),
+                date: Date.now(),
+            }),
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                prompt: prompt,
-                metrics: metrics
-            })
-        });
+        };
 
-        const data = await response.json();
-        console.log('🧠 Ответ ИИ:', data);
+        const userData = await fetchData(url, options);
+
+        console.log('🧠 Ответ ИИ:', userData);
+
+        
+        
+        await handleAiResponse(userData, userID);
 
         // TODO: Обработать ответ ИИ позже
     } catch (error) {
         console.error('Ошибка при отправке метрик ИИ:', error);
     }
-}
+};
 
-function generatePrompt(metrics, status) {
-    return `
-Проведи медицинский анализ следующих метрик HRV:
+async function handleAiResponse(data, userId) {
+    const mainContent = data.content;
+    
+    try {
+        await rebuildAiText(mainContent.patient_instruction);
 
-- Статус HRV: ${status}
-- SDNN: ${metrics.sdnn} мс
-- RMSSD: ${metrics.rmssd} мс
-- pNN50: ${metrics.pnn50}%
-- LF/HF: ${metrics.lfhf}
+        if (mainContent.status === 'critical') {
+            await alarm(mainContent, userId);
+        } else if (mainContent.status === 'warning') {
+            await warning(mainContent);
+        } else {}
+    } catch (e) {
+        console.error('error:', e);
+    }
+};
 
-Проанализируй отклонения от нормы и предложи рекомендации в короткой форме (1-2 абзаца).
-`;
-}
+async function alarm(data, userId) {
+    createMod(6);
+    const modWindow = document.querySelector('#main-dialog');
+    let timeLeft = 60;
+    const button = document.getElementById('alarm-dia-button');
 
-export { monitorHRVStatus };
+    const timerInterval = setInterval(() => {
+        timeLeft--;
+        button.textContent = `Olen kunnossa (${timeLeft})`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            modWindow.close();
+            ahtung(data.inserted_id, userId, false); // если время истекло и не нажали
+        }
+    }, 1000);
+
+    button.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        modWindow.close(); // пользователь нажал кнопку — отменяем тревогу
+    });
+
+};
+
+async function rebuildAiText(textData) {
+    const aiUserBlock = document.querySelector('#patient-ai-text');
+
+    aiUserBlock.textContent = textData;
+};
+
+async function ahtung(insertedID, userID, answered) {
+    try {
+        const url = 'http://localhost:3000/api/emergency/';
+        const options = {
+            body: JSON.stringify({
+                res_id: insertedID,
+                user_id: userID,
+                pat_check: answered,
+                date: Date.now(),
+            }),
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+        };
+
+        const userData = await fetchData(url, options);
+    } catch (e) {
+        console.error('mistake "ahtung!"', e);
+    }
+};
+
+async function getMetric(patID) {
+    try {
+        const url = `http://localhost:3000/api/metrics/${patID}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-type': 'application/json'
+            },
+        };
+
+        const metric = await fetchData(url, options);
+        return metric;
+    } catch (e) {
+        console.error('mistake getting metric', e);
+    }
+};
+
+
+export { monitorHRVStatus, rebuildAiText, getMetric };

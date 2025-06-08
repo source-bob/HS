@@ -50,6 +50,8 @@ const loginUser = async (event) => {
         localStorage.setItem('user_id', response.user.user_id);
         localStorage.setItem('user_type', response.user.user_type);
         localStorage.setItem('user_email', response.user.user_email);
+
+        console.log('USER ID:', response.user.user_id);
     }
 
     console.log(response);

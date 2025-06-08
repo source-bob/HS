@@ -1,8 +1,11 @@
 import { debugMovesenseCharacteristics } from "./debugBLE";
 import HRVState from './hrvState.js';
+import { monitorHRVStatus } from "./hrvAnalyzer.js";
 
 let connectedDevice = null;
 let connectedServer = null;
+
+const rrBuffer = [];
 
 async function scanAvailableDevices() {
     try {
@@ -17,8 +20,9 @@ async function scanAvailableDevices() {
         connectedDevice = device;
         connectedServer = server;
 
-        device.addEventListener('gattserverdisconnected', () => {
-            console.warn('🔌 Laite irrotettu (Device disconnected)');
+        device.addEventListener('gattserverdisconnected', async () => {
+            console.warn('🔌 Устройство отключено, пытаемся переподключиться...');
+            await reconnectDevice(device);
         });
 
         // 🚀 Запускаем слушателя данных
@@ -34,6 +38,28 @@ async function scanAvailableDevices() {
     } catch (error) {
         console.error('Bluetooth-selaus epäonnistui:', error);
         return [];
+    }
+};
+
+let hrChar = null;
+let handleHRValueChanged = null;
+
+async function reconnectDevice(device) {
+    try {
+        console.log('🔄 Пытаемся переподключиться...');
+
+        if (!device.gatt.connected) {
+            const server = await device.gatt.connect();
+            connectedServer = server; // Обновляем глобальную переменную
+            await startHRVDataListener(server);
+            await startRRBufferMonitor();
+            console.log('✅ Переподключение выполнено успешно');
+        } else {
+            console.log('🔗 Устройство уже подключено');
+        }
+
+    } catch (error) {
+        console.error('❌ Ошибка переподключения:', error);
     }
 };
 
@@ -55,48 +81,40 @@ async function populateDeviceList() {
 async function startHRVDataListener(server) {
     try {
         const hrService = await server.getPrimaryService('heart_rate');
-        const hrChar = await hrService.getCharacteristic('heart_rate_measurement');
+        hrChar = await hrService.getCharacteristic('heart_rate_measurement');
 
-        await hrChar.startNotifications();
-        hrChar.addEventListener('characteristicvaluechanged', (event) => {
+        // Удаляем старый обработчик, если он был
+        if (handleHRValueChanged) {
+            hrChar.removeEventListener('characteristicvaluechanged', handleHRValueChanged);
+        }
+
+        // Объявляем и сохраняем новый обработчик
+        handleHRValueChanged = (event) => {
             const data = parseHeartRateWithRR(event.target.value);
             console.log(`❤️ Syke (Heart Rate): ${data.heartRate} bpm`);
 
-            HRVState.setHeartRate(data.heartRate); // <-- вместо прямой записи на страницу
+            HRVState.setHeartRate(data.heartRate);
 
             if (data.rrIntervals.length > 0) {
                 console.log(`⏱ RR-intervallit (ms):`, data.rrIntervals);
 
                 const metrics = updateRRMetrics(data.rrIntervals);
-
                 if (metrics) {
                     const hrvStatus = classifyHRV(metrics.sdnn);
-                    console.log(`📊 HRV-metriikat: SDNN=${metrics.sdnn}, RMSSD=${metrics.rmssd}, pNN50=${metrics.pnn50}%`);
+                    console.log(`📊 HRV-metriikat: SDNN=${metrics.sdnn}, RMSSD=${metrics.rmssd}, pNN50=${metrics.pnn50}%, ${metrics.rrMean}`);
                     console.log('🧬 HRV-tulkinta:', hrvStatus);
 
-                    HRVState.setRRMetrics(metrics); // <-- обновляем метрики
-                    HRVState.setHRVStatus(hrvStatus); // <-- и статус HRV
+                    HRVState.setRRMetrics(metrics);
+                    HRVState.setHRVStatus(hrvStatus);
                 }
             } else {
                 console.log('RR-intervallit eivät ole saatavilla');
+                return;
             }
-        });
+        };
 
-        // 🧪 Подключение других характеристик (Movesense)
-        const msService = await server.getPrimaryService('0000fdf3-0000-1000-8000-00805f9b34fb');
-
-        const char1 = await msService.getCharacteristic('6b200001-ff4e-4979-8186-fb7ba486fcd7');
-        const char2 = await msService.getCharacteristic('6b200002-ff4e-4979-8186-fb7ba486fcd7');
-
-        await char1.startNotifications();
-        char1.addEventListener('characteristicvaluechanged', (e) => {
-            console.log('🔔 Char 1:', new Uint8Array(e.target.value.buffer));
-        });
-
-        await char2.startNotifications();
-        char2.addEventListener('characteristicvaluechanged', (e) => {
-            console.log('🔔 Char 2:', new Uint8Array(e.target.value.buffer));
-        });
+        await hrChar.startNotifications();
+        hrChar.addEventListener('characteristicvaluechanged', handleHRValueChanged);
 
     } catch (err) {
         console.error('Virhe HRV-tiedon käsittelyssä:', err);
@@ -107,6 +125,27 @@ function classifyHRV(sdnn) {
     if (sdnn < 50) return "Alhainen HRV (riski)";
     if (sdnn < 100) return "Normaali HRV";
     return "Korkea HRV (erinomainen)";
+};
+
+let hrvCheckInterval = null;
+
+async function startRRBufferMonitor() {
+    if (hrvCheckInterval !== null) return; // Уже запущено
+
+    hrvCheckInterval = setInterval(async () => {
+        if (rrBuffer.length >= 300) {
+            clearInterval(hrvCheckInterval);
+            hrvCheckInterval = null;
+            console.log("📈 Достигнута длина rrBuffer 300, запускаем анализ...");
+            try {
+                await monitorHRVStatus();
+            } catch (e) {
+                console.error("❌ Ошибка при анализе HRV:", e);
+            }
+        } else {
+            console.log("⏳ Текущая длина rrBuffer:", rrBuffer?.length || 0);
+        }
+    }, 5000);
 };
 
 function parseHeartRateWithRR(dataView) {
@@ -138,13 +177,11 @@ function parseHeartRateWithRR(dataView) {
     return { heartRate, rrIntervals };
 };
 
-const rrBuffer = [];
-
 function updateRRMetrics(newRRs) {
     // Добавляем новые RR-интервалы
     rrBuffer.push(...newRRs);
 
-    // Ограничиваем буфер до последних 300 интервалов
+    // Ограничиваем буфер до последних 60 интервалов
     while (rrBuffer.length > 300) {
         rrBuffer.shift();
     }
@@ -175,17 +212,17 @@ function updateRRMetrics(newRRs) {
 
     // где-то можно показать его в консоли
     if (lfHfRatio) {
-        console.log(`⚡ LF/HF-соотношение: ${lfHfRatio}`);
+        console.log(`⚡ LF/HF-suhde: ${lfHfRatio}`);
     }
 
-    return { sdnn: Math.round(sdnn), rmssd: Math.round(rmssd), pnn50: Math.round(pnn50), lfhf: lfHfRatio };
+    return { sdnn: Math.round(sdnn), rmssd: Math.round(rmssd), pnn50: Math.round(pnn50), lfhf: lfHfRatio, rr_mean: Math.round(mean) };
 };
 
 function calculateLFHFRatio(rrIntervals) {
     if (rrIntervals.length < 8) return null; // слишком мало точек
 
     // 1. Нормализуем интервалы (в секундах)
-    const rrSec = rrIntervals.map(rr => rr / 1000);  // перевести миллисекунды в секунды
+    const rrSec = rrIntervals.map(rr => rr / 1000);
 
     // 2. Создаем временные точки
     const timestamps = [];
@@ -199,7 +236,7 @@ function calculateLFHFRatio(rrIntervals) {
     const fs = 4; // частота дискретизации
     const dt = 1 / fs;
     const uniformTimes = [];
-    for (let i = 0; i < timestamps[timestamps.length - 1]; i += dt) {
+    for (let i = 0; i < timestamps[timestamps.length-1]; i += dt) {
         uniformTimes.push(i);
     }
 
@@ -207,15 +244,15 @@ function calculateLFHFRatio(rrIntervals) {
     const interpolated = uniformTimes.map(t => {
         for (let i = 1; i < timestamps.length; i++) {
             if (timestamps[i] >= t) {
-                const t1 = timestamps[i - 1];
+                const t1 = timestamps[i-1];
                 const t2 = timestamps[i];
-                const rr1 = rrSec[i - 1];
+                const rr1 = rrSec[i-1];
                 const rr2 = rrSec[i];
                 const alpha = (t - t1) / (t2 - t1);
                 return rr1 + alpha * (rr2 - rr1);
             }
         }
-        return rrSec[rrSec.length - 1];
+        return rrSec[rrSec.length-1];
     });
 
     // 4. Быстрое преобразование Фурье (очень базовое)

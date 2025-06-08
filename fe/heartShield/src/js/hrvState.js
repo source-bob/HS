@@ -2,6 +2,7 @@ const HRVState = {
     heartRate: null,
     hrvStatus: null,
     rrMetrics: null,
+    lfHf: null,
     subscribers: [],
 
     setHeartRate(hr) {

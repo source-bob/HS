@@ -2,11 +2,14 @@ import '../css/patient.css';
 import { fillPatientData, addEventListenersPatient } from './users';
 import { debugMovesenseCharacteristics } from './debugBLE';
 import HRVState from './hrvState.js';
+import { createMod } from './mods.js';
+import { savePos } from './geo.js';
 
 window.debugMovesenseCharacteristics = debugMovesenseCharacteristics;
 
 fillPatientData();
 addEventListenersPatient();
+savePos();
 
 const hrValue = document.querySelector('#patient-info-hr-value');
 const hrvValue = document.querySelector('#patient-info-hrv-value');

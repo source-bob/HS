@@ -92,7 +92,7 @@
     box-sizing: border-box;
     background-color: aquamarine;
     margin: auto;
-    max-width: 100%;
+    max-width: 95%;
     max-height: 100%
 }
 
@@ -160,4 +160,35 @@
 #dia-mittari-status {
     margin-left: 2%;
     background-color: #3D3D3D;
+}
+
+.alarm-block-dia {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    border: 2px solid black;
+    background-color: aqua;
+    box-sizing: border-box;
+}
+
+.alarm-symb-block {
+    width: 5%;
+    height: 100%;
+    background-color: aliceblue;
+}
+
+.alarm-text-block {
+    width: 95%;
+    height: 100%;
+    background-color: #3D3D3D;
+}
+
+#alarm-button-div {
+    width: 100%;
+    background-color: blue;
+}
+
+#alarm-dia-button {
+    width: 100%;
+    padding: 2%;
 }

@@ -1,5 +1,4 @@
 import express from 'express';
-import { body } from 'express-validator';
 
 import { getUsers, getPatients, getUserByStatusAndId } from '../controllers/user-controller.js';
 import { authenticateToken } from '../middlewares/authentication.js';

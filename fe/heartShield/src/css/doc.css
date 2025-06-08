@@ -125,4 +125,113 @@
     border-radius: 3%;
 }
 
+.alarm-dia-metrics {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 10%;
+    background-color: darkblue;
+}
 
+.alarm-dia-add-metric {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    background-color: green;
+    min-width: 40px;
+    margin-right: 2%;
+}
+
+#alarm-dia-main-info {
+    display: flex;
+}
+
+.alarm-dia-add-part {
+    display: flex;
+    width: 100%;
+}
+
+#alarm-id {
+    display: none;
+}
+
+.doc-but-header-part {
+    display: flex;
+    border: 2px solid black;
+    background-color: brown;
+    box-sizing: border-box;
+    width: 104%;
+    gap: 2%;
+}
+
+.mod8-row {
+    display: flex;
+}
+
+.header-block {
+    width: 15%;
+    background-color: aqua;
+    min-width: 67px;
+}
+
+.data-block {
+    text-align: left;
+    width: 100%;
+}
+
+.mod8-buttons {
+    margin-left: 5%;
+    margin-bottom: 2%;
+    width: 90%;
+    display: flex;
+    justify-content: space-between;
+    background-color: aquamarine;
+    min-height: 35px;
+}
+
+.mod8-button {
+    width: 40%;
+    background-color: blue;
+}
+
+.mod8-ai-button {
+    width: 100%;
+    height: 100%;
+}
+
+.mod10-table {
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+}
+
+.mod10-table-half {
+    width: 50%;
+    display: flex;
+}
+
+.mod10-table-column:nth-child(2) {
+    width: 50%;
+}
+
+.mod10-table-column-value {
+    margin-left: 10%;
+}
+
+.mod10-buttons {
+    display: flex;
+    width: 90%;
+    margin-left: 5%;
+    margin-bottom: 2%;
+    justify-content: space-between;
+}
+
+.mod10-button {
+    width: 40%;
+    min-width: 100px;
+    background-color: blue;
+}
+
+.mod10-nav-button {
+    width: 100%;
+}

@@ -3,63 +3,90 @@ CREATE DATABASE heartshield;
 USE heartshield;
 
 CREATE TABLE allusers (
-user_id					INT				UNIQUE PRIMARY KEY,
-user_email				VARCHAR(100)	NOT NULL UNIQUE,
-user_password			VARCHAR(250)	NOT NULL,
-user_type				VARCHAR(3)		NOT NULL
+    user_id					INT				UNIQUE PRIMARY KEY,
+    user_email				VARCHAR(100)	NOT NULL UNIQUE,
+    user_password			VARCHAR(250)	NOT NULL,
+    user_type				VARCHAR(3)		NOT NULL
 );
 
 CREATE TABLE doctors (
-id						INT				PRIMARY KEY,
-name					VARCHAR(50)		NOT NULL,
-surname					VARCHAR(50)		NOT NULL,
-henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
-phone					VARCHAR(20)		NOT NULL UNIQUE,
-dateofbirth				DATE			NOT NULL,
-dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
-FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE
+    id						INT				PRIMARY KEY,
+    name					VARCHAR(50)		NOT NULL,
+    surname					VARCHAR(50)		NOT NULL,
+    henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
+    phone					VARCHAR(20)		NOT NULL UNIQUE,
+    dateofbirth				DATE			NOT NULL,
+    dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE admins (
-id						INT				PRIMARY KEY,
-name					VARCHAR(50)		NOT NULL,
-surname					VARCHAR(50)		NOT NULL,
-henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
-phone					VARCHAR(20)		NOT NULL UNIQUE,
-dateofbirth				DATE			NOT NULL,
-dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
-FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE
+    id						INT				PRIMARY KEY,
+    name					VARCHAR(50)		NOT NULL,
+    surname					VARCHAR(50)		NOT NULL,
+    henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
+    phone					VARCHAR(20)		NOT NULL UNIQUE,
+    dateofbirth				DATE			NOT NULL,
+    dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE patients (
-id						INT				PRIMARY KEY,
-NAME					VARCHAR(50)		NOT NULL,
-surname					VARCHAR(50)		NOT NULL,
-henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
-phone					VARCHAR(20)		NOT NULL UNIQUE,
-dateofbirth				DATE			NOT NULL,
-dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
-doc						INT				NOT NULL,
-FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE,
-FOREIGN KEY (doc) REFERENCES doctors(id)
+    id						INT				PRIMARY KEY,
+    name					VARCHAR(50)		NOT NULL,
+    surname					VARCHAR(50)		NOT NULL,
+    henkilotunnus			VARCHAR(15)		NOT NULL UNIQUE,
+    phone					VARCHAR(20)		NOT NULL UNIQUE,
+    dateofbirth				DATE			NOT NULL,
+    dateofregistration	    DATETIME		DEFAULT CURRENT_TIMESTAMP,
+    doc						INT				NOT NULL,
+    FOREIGN KEY (id) REFERENCES allusers(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (doc) REFERENCES doctors(id)
 );
 
 CREATE TABLE patientrecomm (
-rec_id					INT				AUTO_INCREMENT PRIMARY KEY,
-rec_date				DATETIME		DEFAULT CURRENT_TIMESTAMP,
-rec_patientid			INT				NOT NULL,
-rec_text				VARCHAR(200)	NOT NULL,
-FOREIGN KEY (rec_patientid) REFERENCES patients(id) ON DELETE CASCADE
+    rec_id					INT				AUTO_INCREMENT PRIMARY KEY,
+    rec_date				DATETIME		DEFAULT CURRENT_TIMESTAMP,
+    rec_patientid			INT				NOT NULL,
+    rec_text				VARCHAR(200)	NOT NULL,
+    FOREIGN KEY (rec_patientid) REFERENCES patients(id) ON DELETE CASCADE
 );
 
-CREATE TABLE patientresult (
-res_id					INT				AUTO_INCREMENT PRIMARY KEY,
-res_date				DATETIME		DEFAULT CURRENT_TIMESTAMP,
-res_patientid			INT				NOT NULL,
-res_status				VARCHAR(15)		NOT NULL,
-res_text				VARCHAR(200)	NOT NULL,
-FOREIGN KEY (res_patientid) REFERENCES patients(id) ON DELETE CASCADE
+CREATE TABLE metrics (
+    metric_id               INT             AUTO_INCREMENT PRIMARY KEY,
+    pat_id                  INT             NOT NULL,
+    lf_hf                   DOUBLE          NOT NULL,
+    sdnn                    INT             NOT NULL,
+    rmssd                   INT             NOT NULL,
+    pnn50                   INT             NOT NULL,
+    hr                      INT             NOT NULL,
+    rr_mean                 INT             NOT NULL,
+    metric_date             DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE
 );
+
+CREATE TABLE ai_results (
+    result_id               INT             AUTO_INCREMENT PRIMARY KEY,
+    pat_id                  INT             NOT NULL,
+    result_status           VARCHAR(50)     NOT NULL,
+    result_pat_text         VARCHAR(150)    NOT NULL,
+    result_doc_text         VARCHAR(500)    NOT NULL,
+    readed                  VARCHAR(10)     NOT NULL,
+    result_date             DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE
+);
+
+CREATE TABLE alarms (
+    res_id                  INT             PRIMARY KEY,
+    pat_id                  INT             NOT NULL,
+    doc_id                  INT             NOT NULL,
+    pat_check               BOOLEAN         NOT NULL,
+    doc_check               BOOLEAN         NOT NULL,
+    FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doc_id) REFERENCES doctors(id) ON DELETE CASCADE
+);
+
+
 
 /*admins*/
 INSERT INTO allusers (user_id, user_email, user_password, user_type)
@@ -119,3 +146,18 @@ INSERT INTO allusers (user_id, user_email, user_password, user_type)
 VALUES (1650, 'renedescartes@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
 VALUES (1650, 'Rene', 'Descartes', '310396-D', '(+33) 001 0003', 31/03/1596, 1937);
+
+/*metrics*/
+
+INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean)
+VALUES (1959, 1.04, 131, 129, 43, 74, 926);
+INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean)
+VALUES (1959, 0.99, 126, 135, 40, 69, 917);
+
+/*alarms*/
+
+INSERT INTO alarms (res_id, pat_id, doc_id, pat_check, doc_check)
+VALUES (1, 1959, 1936, false, false);
+
+INSERT INTO alarms (res_id, pat_id, doc_id, pat_check, doc_check)
+VALUES (2, 1959, 1936, false, false);
