@@ -1,6 +1,7 @@
 import { fetchData } from "./fetch";
 import { createMod, formatDate } from "./mods";
 import { rebuildAiText, getMetric } from "./hrvAnalyzer";
+import { showMessageModal, createButton, selectBlock, getVal, showErrorModal, makeModHeader, userType, userID } from "./mech";
 
 const modBody = document.querySelector('#dia-main-block');
 const diaBody = document.querySelector('#dia-body');
@@ -116,6 +117,7 @@ const getFullAiResponse = async (userId) => {
 const createBlocks = async (blocks, blockType, blockTarget) => {
     
     const blockArea = document.querySelector(blockTarget);
+    blockArea.innerHTML = '';
     
     if (blockType === 'adm') {
         let statusName;
@@ -146,6 +148,7 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
 
             blockArea.appendChild(displayBlock);
         });
+        addAdmEventListeners();
     } else if (blockType === 'doc') {
         blocks.forEach((block) => {
 
@@ -278,7 +281,49 @@ const addEventListenersPatient = async () => {
     });
 };
 
+const addAdmEventListeners = () => {
+    const newUser = document.querySelector('#adm-new-user');
+
+    newUser.addEventListener('click', async () => {
+        await createNewPatient();
+    });
+
+    // Добавляем слушатели на кнопки удаления пользователей
+    const deleteButtons = document.querySelectorAll('.del-user-button');
+
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', async () => {
+            const userBlock = button.closest('.adm-user-block');
+            const userId = userBlock.querySelector('#delete-pat-id')?.textContent?.trim();
+
+            if (!userId) {
+                console.error('User ID not found');
+                return;
+            }
+
+            const response = await deleteUserById(userId);
+            if (response) {
+                userBlock.remove();
+                await showMessageModal('user deleted', 'onnistui');
+            }
+
+            // Удаляем блок из DOM после успешного удаления
+            
+        });
+    });
+};
+
 const addDocEventListeners = () => {
+    const newPatient = document.querySelector('#doc-new-pot');
+    const deletePatient = document.querySelector('#doc-del-pot');
+
+    deletePatient.addEventListener('click', async () => {
+        await patientDeleter();
+    });
+
+    newPatient.addEventListener('click', async () => {
+        await createNewPatient();
+    });
     document.querySelectorAll('.patient-block').forEach((div) => {
         console.log(div);
 
@@ -305,6 +350,254 @@ const addDocEventListeners = () => {
             createMod(11);
         });
     });
+};
+
+const deleteUserById = async (userId) => {
+    try {
+        const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }, // если API требует это
+        });
+
+        if (!response.ok) {
+            console.error(`Ошибка при удалении пользователя ${userId}`);
+            return false;
+        } else {
+            console.log(`Пользователь ${userId} успешно удалён`);
+            return true;
+        }
+    } catch (err) {
+        console.error('Ошибка при удалении пользователя:', err);
+        return false;
+    }
+};
+
+const collectUserFields = () => {
+    const userType = localStorage.getItem('user_type');
+
+    return {
+        name: getVal('new-pot-name'),
+        surname: getVal('new-pot-surname'),
+        birthday: getVal('new-pot-dob'),
+        ssn: getVal('new-pot-ht'),
+        phone: getVal('new-pot-phone'),
+        email: getVal('new-pot-mail'),
+        password: getVal('new-pot-pass'),
+        confirmPassword: getVal('new-pot-passconf'),
+        userType: userType === 'adm'
+            ? getVal('new-pot-type')
+            : 'pot'
+    };
+};
+
+const validateUserFields = (user) => {
+    for (const key in user) {
+        if (!user[key]) {
+            return `Field "${key}" is required.`;
+        }
+    }
+
+    if (user.password !== user.confirmPassword) {
+        return 'Passwords not same';
+    }
+
+    return null;
+};
+
+const patientDeleter = async () => {
+    createMod(17);
+    const deleteButton = await createButton('new-save-button', 'dia-control-button', 'delete', deletePatient);
+    console.log(deleteButton);
+    diaBody.appendChild(deleteButton);
+};
+
+const deletePatient = async () => {
+    const potID = getVal('delete-pot-id');
+    if (!potID) {
+        showErrorModal(patientDeleter, 'you have to put patient id', '👤 Delete patient');
+    } else {
+        const check = await checkDocPatient(potID, userID());
+        console.log('CHECK', potID, check);
+    }
+};
+
+const checkDocPatient = async (patientID, docID) => {
+    console.log(patientID, docID);
+    const patient = await getUserInfo(patientID, 'pot');
+    if (!patient || patient.error) {
+        showErrorModal(patientDeleter, 'Patient id not found', '👤 Delete patient');
+        return false;
+    } else {
+        if (patient.doc !== docID) {
+            console.log('CHECKING', patient.doc, docID);
+            showErrorModal(patientDeleter, 'This is not your patient', '👤 Delete patient');
+            return false;
+        } else {
+            const result = await deleteUserById(patientID);
+            if (result) {
+                showMessageModal('Patient deleted', '👤 Delete patient');
+                getUsers(); 
+                return true;
+            } else {
+                showErrorModal(patientDeleter, 'Something went wrong', '👤 Delete patient');
+            }
+        }
+    }
+};
+
+const createNewPatient = async () => {
+    createMod(12);
+
+    const luoUusi = document.createElement('div');
+    luoUusi.className = 'mod12-new-pat';
+    luoUusi.innerHTML = `<button id="luo-uusi-pot">X Luo profiili</button>`;
+    diaBody.appendChild(luoUusi);
+
+    const newButton = document.querySelector('#luo-uusi-pot');
+    newButton.addEventListener('click', async () => {
+        await loadNewUser();
+    });
+};
+
+const patData = async () => {
+    createMod(14);
+    const diaBody = await selectBlock('dia-body');
+    const saveButton = await createButton('new-save-button', 'dia-control-button', 'save data', userAddInfo);
+
+    diaBody.appendChild(saveButton);
+};
+
+const userAddInfo = async () => {
+    const miDateInput = await selectBlock('new-pot-mi');
+    const pillInput = await selectBlock('new-pot-drugs');
+    const patientAge = localStorage.getItem('patient_age');
+    const patientID = localStorage.getItem('patient_id');
+
+    if (!miDateInput?.value.trim() || !pillInput?.value.trim()) {
+        await showErrorModal(patData, 'Put MI date and pills', '➕ Create new patient');
+        return;
+    }
+
+    if (!patientID || !patientAge) {
+        await showErrorModal(patData, 'Patient ID or age missing', '➕ Create new patient');
+        return;
+    }
+
+    const blocks = {
+        id: patientID,
+        age: patientAge,
+        mi: miDateInput.value.trim(),
+        pills: pillInput.value.trim()
+    };
+
+    console.log('Доп данные пациента:', blocks);
+
+    const success = await loadAddData(blocks);
+    
+    if (success) {
+        await userCreated();
+    } else {
+        await showErrorModal(patData, 'Something went wrong, try again.', '➕ Create new patient');
+    }
+    
+};
+
+const loadAddData = async (patientData) => {
+    const { id, age, mi, pills } = patientData;
+    
+    const url = `http://localhost:3000/api/users/${id}`;
+    const options = {
+        body: JSON.stringify({
+            age: age,
+            mi_date: mi,
+            pills: pills
+        }),
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        },
+    };
+
+    const savedData = await fetchData(url, options);
+
+    if (!savedData || savedData.error) {
+        await showErrorModal(patData, 'Ошибка при создании пользователя', '➕ Create new patient');
+        return false;
+    }
+
+    console.log('patient data added:', savedData);
+    return true;
+};
+
+const userCreated = async () => {
+    createMod(15);
+    const userLvl = userType();
+    makeModHeader(userLvl === 'doc' ? '➕ Create new patient' : '➕ Create new user');
+    getUsers();
+};
+
+const loadNewUser = async () => {
+    const user = collectUserFields();
+    const errorMessage = validateUserFields(user);
+    let userId;
+    
+
+    if (errorMessage) {
+        const userLvl = userType();
+        await showErrorModal(createNewPatient, errorMessage, '');
+        makeModHeader(userLvl === 'doc' ? '➕ Create new patient' : '➕ Create new user');
+        
+        return;
+    }
+
+    console.log('Данные пациента:', user);
+
+    try {
+        const url = `http://localhost:3000/api/users/`;
+        const options = {
+            body: JSON.stringify({
+                name: user.name,
+                surname: user.surname,
+                birthday: user.birthday,
+                ht: user.ssn,
+                phone: user.phone,
+                email: user.email,
+                pass: user.password,
+                user_type: user.userType,
+                creator_id: userID(),
+            }),
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+        };
+
+        const savedUser = await fetchData(url, options);
+
+        if (!savedUser || savedUser.error) {
+            await showErrorModal(createNewPatient, 'Ошибка при создании пользователя', '➕ Create new user');
+            return;
+        }
+
+        userId = savedUser.userId;
+
+        console.log('user saved:', savedUser);
+    } catch (e) {
+        console.error('mistake load main data');
+    }
+
+    if (user.userType === 'pot') {
+        const userAge = await getAge(user.birthday);
+        localStorage.setItem('patient_age', userAge);
+        localStorage.setItem('patient_id', userId);
+        await patData();
+    } else {
+        await userCreated();
+    }
 };
 
 const getPatMittauskaavio = async (patID) => {
@@ -389,6 +682,18 @@ const attachMetricsNavigation = (blocks, metrics) => {
     update(); // начальная отрисовка
 };
 
+const getPatTautihistoria = async (patID) => {
+    const patientInfo = await getUserInfo(patID, 'pot');
+    createMod(9);
+
+    const blocks = {
+        pot_name: document.querySelector('#but-header-part-name'),
+        pot_surname: document.querySelector('#but-header-part-surname'),
+    };
+
+    blocks.pot_name.textContent = patientInfo.name;
+    blocks.pot_surname.textContent = patientInfo.surname;
+};
 
 const getPatAIreports = async (patID) => {
     createMod(8);
@@ -465,9 +770,7 @@ const attachReportNavigation = (blocks, reports) => {
 };
 
 
-const getPatTautihistoria = async (patID, amount) => {
-    createMod(9);
-};
+
 
 const getPatSuositukset = async (patID, amount) => {};
   

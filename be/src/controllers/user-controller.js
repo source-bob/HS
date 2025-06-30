@@ -1,4 +1,12 @@
-import { getAllUsers, getDocPatients, selectUserByStatusAndId } from '../models/user-model.js';
+import {
+  getAllUsers,
+  getDocPatients,
+  selectUserByStatusAndId,
+  addUser,
+  loadPatientData,
+  deleteUserByID
+} from '../models/user-model.js';
+import bcrypt from 'bcryptjs';
 
 const getUsers = async (req, res) => {
   const users = await getAllUsers();
@@ -8,6 +16,75 @@ const getUsers = async (req, res) => {
   } else {
     res.status(500);
     res.json(users);
+  }
+};
+
+const patientData = async (req, res, next) => {
+  const userData = req.body;
+  userData.user_id = req.params.id;
+  console.log(userData);
+  console.log(req.params.id);
+
+  try {
+    const result = await loadPatientData(userData);
+
+    if (!result || result.error) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.status(201).json({ message: 'Add data added', userId: result.insertId });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const newUser = async (req, res, next) => {
+  console.log(req.body);
+  const { name, surname, birthday, ht, phone, email, pass, user_type, creator_id } = req.body;
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(pass, salt);
+
+    const newUser = {
+      name,
+      surname,
+      birthday,
+      ht,
+      phone,
+      email,
+      pass: hashedPassword,
+      user_type,
+      creator_id
+    };
+
+    console.log('New user:', newUser);
+
+    const result = await addUser(newUser);
+
+    if (!result || result.error) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.status(201).json({ message: 'User added', userId: result.insertId });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  console.log('delete');
+
+  try {
+    const deletedUser = await deleteUserByID(req.params.id);
+
+    if (!deletedUser || deletedUser.error) {
+      return res.status(500).json({ error: deletedUser.error });
+    }
+
+    res.status(201).json({ message: 'User deleted' });
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -48,4 +125,4 @@ const getUserByStatusAndId = async (req, res) => {
 
 
 
-export { getUsers, getPatients, getUserByStatusAndId };
+export { getUsers, getPatients, getUserByStatusAndId, newUser, patientData, deleteUser };

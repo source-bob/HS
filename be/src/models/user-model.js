@@ -19,6 +19,17 @@ import promisePool from '../utils/database.js';
   }
 };*/
 
+/*const getUser = async (userId) => {
+  try {
+    const [rows] = await promisePool.query(`
+      SELECT user_id, user_type from allusers WHERE user_id = ${userId}`);
+      return rows[0];
+  } catch (e) {
+    console.error(e);
+    throw new Error('database error');
+  }
+};*/
+
 const selectUserByEmail = async (email) => {
   try {
     const [rows] = await promisePool.query(
@@ -34,6 +45,149 @@ const selectUserByEmail = async (email) => {
   } catch (error) {
     console.error(error);
     throw new Error('database error');
+  }
+};
+
+const addUser = async (userData) => {
+  const { name, surname, birthday, ht, phone, email, pass, user_type, creator_id } = userData;
+
+  const mainResult = await loadMainData([email, pass, user_type]);
+
+  if (mainResult.error) {
+    console.error('Error inserting main user data:', mainResult.error);
+    return { error: mainResult.error };
+  }
+
+  const userID = mainResult.insertId;
+  console.log('Inserted user ID:', userID);
+
+  // Сохраняем доп. данные в соответствующую таблицу
+  const addDataResult = await loadAddData({
+    userID,
+    name,
+    surname,
+    birthday,
+    ht,
+    phone,
+    user_type,
+    creator_id
+  });
+
+  if (addDataResult.error) {
+    return { error: addDataResult.error };
+  }
+
+  return { insertId: userID };
+};
+
+
+const loadMainData = async (data) => {
+  const sql = `
+  INSERT INTO allusers (user_email, user_password, user_type)
+  VALUES (?, ?, ?)`;
+
+  try {
+    const [result] = await promisePool.query(sql, data);
+
+    console.log('Insert result:', result);
+
+    if (result.affectedRows === 1) {
+      console.log('user now in database');
+      return { insertId: result.insertId };
+    } else {
+      return { error: 'user was not inserted' };
+    }
+  } catch (e) {
+    console.error('MySQL error:', e.message);
+    return {error: e.message};
+  }
+};
+
+const loadAddData = async ({ userID, name, surname, birthday, ht, phone, user_type, creator_id }) => {
+  const tableMap = {
+    pot: 'patients',
+    doc: 'doctors',
+    adm: 'admins'
+  };
+
+  const tableName = tableMap[user_type];
+
+  if (!tableName) {
+    return { error: 'Unknown user type' };
+  }
+
+  // Строим SQL и параметры для каждого типа
+  let sql, params;
+
+  if (user_type === 'pot') {
+    sql = `
+      INSERT INTO ${tableName} (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    params = [userID, name, surname, ht, phone, birthday, creator_id];
+  } else {
+    sql = `
+      INSERT INTO ${tableName} (id, name, surname, henkilotunnus, phone, dateofbirth)
+      VALUES (?, ?, ?, ?, ?, ?)`;
+    params = [userID, name, surname, ht, phone, birthday];
+  }
+
+  try {
+    const [result] = await promisePool.query(sql, params);
+
+    if (result.affectedRows === 1) {
+      console.log(`Additional data inserted into ${tableName}`);
+      return { success: true };
+    } else {
+      return { error: `Failed to insert into ${tableName}` };
+    }
+  } catch (e) {
+    console.error(`MySQL error while inserting into ${tableName}:`, e.message);
+    return { error: e.message };
+  }
+};
+
+const deleteUserByID = async (userID) => {
+  console.log('USER MODEL:', userID);
+
+  const sql = `DELETE FROM allusers WHERE user_id = ?`;
+  const params = [userID];
+
+  try {
+    const [result] = await promisePool.query(sql, params);
+
+    if (result.affectedRows === 1) {
+      console.log('User deleted');
+      return true;
+    } else {
+      return { error: 'Failed to delete user' };
+    }
+  } catch (e) {
+    console.error(`MySQL error:`, e.message);
+    return { error: e.message };
+  }
+};
+
+const loadPatientData = async (data) => {
+  console.log('PATIENT ADD DATA:', data);
+  const { age, mi_date, pills, user_id } = data;
+
+  const sql = `
+  INSERT INTO pat_data (pat_id, age, mi_date, pills)
+  VALUES (?, ?, ?, ?)`;
+  const params = [user_id, age, mi_date, pills];
+
+  try {
+    const [result] = await promisePool.query(sql, params);
+
+    if (result.affectedRows === 1) {
+      console.log(`Additional data inserted`);
+      return true;
+    } else {
+      return { error: `Failed to insert add data` };
+    }
+  } catch (e) {
+    console.error(`MySQL error:`, e.message);
+    return { error: e.message };
   }
 };
 
@@ -94,4 +248,4 @@ const selectUserByStatusAndId = async (status, id) => {
   return rows[0];
 };
 
-export { selectUserByEmail, getAllUsers, getDocPatients, selectUserByStatusAndId };
+export { selectUserByEmail, getAllUsers, getDocPatients, selectUserByStatusAndId, addUser, loadPatientData, deleteUserByID };

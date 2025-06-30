@@ -157,8 +157,9 @@ button:disabled {
     border: none;
     width: 45%;
     padding: 0;
-    margin-top: 7%;
+    margin-top: 3%;
     min-width: 430px;
+    max-height: 100%;
 }
 
 #dia-body {
@@ -197,6 +198,16 @@ button:disabled {
     height: 100%;
     background-color: aquamarine;
     margin-right: 2%;
+}
+
+.hidden-block {
+    visibility: hidden;
+}
+
+.dia-control-button {
+    width: 40%;
+    margin-left: 30%;
+    margin-bottom: 2%;
 }
 
 

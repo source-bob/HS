@@ -1,6 +1,7 @@
 import { fetchData } from "./fetch";
 import { populateDeviceList } from "./mittari";
 import HRVState from "./hrvState";
+import { userType, makeModHeader } from "./mech";
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -40,6 +41,8 @@ const createMod = async (number) => {
     const closeDialogButton = document.querySelector('#close-dialog-button');
     const modBody = document.querySelector('#dia-main-block');
     const modHeader = document.querySelector('#dia-header-value');
+
+    const userLvl = userType();
 
     if (number === 1) {
         modHeader.textContent = 'HRV-Kaavio';
@@ -222,7 +225,16 @@ const createMod = async (number) => {
             <div class="data-block" id="mod8-doc-value"></div>
         </div>`;
     } else if (number === 9) {
-        modBody.textContent = 'MOD 9';
+        modHeader.innerHTML = `
+        <div class="sign-block">📖</div>
+        <div class="doc-but-dia-header">
+            <div class="doc-but-header-part">Tautihistoria</div>
+            <div class="doc-but-header-part">
+                <div class="but-header-part-part">Potilas:</div>
+                <div class="but-header-part-part" id="but-header-part-name"></div>
+                <div class="but-header-part-part" id="but-header-part-surname"></div>
+            </div>
+        </div>`;
     } else if (number === 10) {
         modHeader.innerHTML = `
         <div class="sign-block">📊</div>
@@ -264,6 +276,114 @@ const createMod = async (number) => {
         </div>`;
     } else if (number === 11) {
         modBody.textContent = 'MOD 11';
+    } else if (number === 12) {
+        
+        userLvl === 'doc'
+            ? makeModHeader('➕ Create new patient')
+            : makeModHeader('➕ Create new user');
+        
+        modBody.innerHTML = `
+        <div class="mod12-table">
+            <div class="mod12-row">
+                <div class="sign-block">👤</div>
+                <div class="mod12-row-header">Etunimi:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-name" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">👥</div>
+                <div class="mod12-row-header">Sukunimi:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-surname" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">🎂</div>
+                <div class="mod12-row-header">Syntymäaika:</div>
+                <input type="date" class="mod12-row-input" id="new-pot-dob" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">🆔</div>
+                <div class="mod12-row-header">Henkilötunnus:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-ht" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">📞</div>
+                <div class="mod12-row-header">Puhelinnumero:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-phone" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">📧</div>
+                <div class="mod12-row-header">Sähköposti:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-mail" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">🔒</div>
+                <div class="mod12-row-header">Salasana:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-pass" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">🔐</div>
+                <div class="mod12-row-header">Vahvista salasana:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-passconf" required />
+                <div class="sign-block">*</div>
+            </div>
+        </div>
+        `;
+
+        if (userLvl === 'adm') {
+            const userStatus = document.createElement('div');
+            userStatus.className = 'mod12-row';
+
+            userStatus.innerHTML = `
+            <div class="sign-block">⚙️</div>
+            <div class="mod12-row-header">User type:</div>
+            <select class="mod12-row-input" id="new-pot-type" required>
+                <option value="">-- Valitse --</option>
+                <option value="adm">adm</option>
+                <option value="doc">doc</option>
+            </select>
+            <div class="sign-block">*</div>`;
+            modBody.appendChild(userStatus);
+        }
+    } else if (number === 13) {
+        console.log('MOD 13');
+    } else if (number === 14) {
+        modHeader.innerHTML = `<div>➕ Create new patient</div>`;
+        modBody.innerHTML = `
+        <div class="mod12-table">
+            <div class="mod12-row">
+                <div class="sign-block">🗓️</div>
+                <div class="mod12-row-header">MI date:</div>
+                <input type="date" class="mod12-row-input" id="new-pot-mi" required />
+                <div class="sign-block">*</div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">💊</div>
+                <div class="mod12-row-header">Lääkkeet:</div>
+                <input type="text" class="mod12-row-input" id="new-pot-drugs" />
+                <div class="sign-block">*</div>
+            </div>
+        </div>
+        `;
+    } else if (number === 15) {
+        modBody.innerHTML = `<div>User successfully created</div>`;
+    } else if (number === 16) {
+        console.log('MOD 16');
+    } else if (number === 17) {
+        console.log('MOD 17');
+        makeModHeader('👤 Delete patient');
+        modBody.innerHTML = `
+        <div class="mod12-row">
+            <div class="sign-block">🆔</div>
+            <div class="mod12-row-header">Patient ID:</div>
+            <input type="text" class="mod12-row-input" id="delete-pot-id" required />
+            <div class="sign-block">*</div>
+        </div>`;
     }
 
     closeDialogButton.addEventListener('click', () => {
@@ -296,6 +416,8 @@ function refreshDia (body) {
     </div>
     <div id="dia-main-block"></div>`;
 };
+
+
 
 
 

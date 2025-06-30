@@ -30,12 +30,31 @@ GET http://localhost:3000/api/users/adm/1840
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxODQwLCJ1c2VyX2VtYWlsIjoiYWRhbG92ZWxhY2VAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJhZG0iLCJpYXQiOjE3NDQ5NzI0OTksImV4cCI6MTc0NTA1ODg5OX0.jbLfS80nJdivDmUhbVG-hCu5XYENAzxkzmJBu-1CdFA
 
 ###
-POST http://localhost:3000/api/ai
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxOTU5LCJ1c2VyX2VtYWlsIjoiam9obm5hc2hAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJwb3QiLCJpYXQiOjE3NDY2MjE4NTYsImV4cCI6MTc0NjcwODI1Nn0.K785XeMEfon-uMKLfeirE5L3xjeJA38Xgpb9_OacYxg
+POST http://localhost:3000/api/users/
 Content-Type: application/json
 
 {
-    "prompt": ''
+    "name": "Jack",
+    "surname": "Jackson",
+    "birthday": "1992-02-09",
+    "ht": "090292-777D",
+    "phone": "046-633-99-65",
+    "email": "jackson@example.com",
+    "pass": "adminpass",
+    "user_type": "adm",
+    "creator_id": 1
 }
 
-const aiTest = () => {};
+###
+POST http://localhost:3000/api/users/6
+Content-Type: application/json
+
+{
+    "age": 71,
+    "mi_date": "2000-12-19",
+    "pills": "aspirin"
+}
+
+
+###
+DELETE http://localhost:3000/api/users/30

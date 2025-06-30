@@ -3,7 +3,7 @@ CREATE DATABASE heartshield;
 USE heartshield;
 
 CREATE TABLE allusers (
-    user_id					INT				UNIQUE PRIMARY KEY,
+    user_id					INT				AUTO_INCREMENT PRIMARY KEY,
     user_email				VARCHAR(100)	NOT NULL UNIQUE,
     user_password			VARCHAR(250)	NOT NULL,
     user_type				VARCHAR(3)		NOT NULL
@@ -86,78 +86,94 @@ CREATE TABLE alarms (
     FOREIGN KEY (doc_id) REFERENCES doctors(id) ON DELETE CASCADE
 );
 
+CREATE TABLE pat_data (
+    pat_id                  INT             PRIMARY KEY,
+    age                     INT             NOT NULL,
+    mi_date                 DATE            NOT NULL,
+    pills                   VARCHAR(100),
+    FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE
+);
+
 
 
 /*admins*/
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1840, 'adalovelace@example.com', '$2b$10$MXIpfGHiq20TO2/kJxX8deV5Pr2g0WjUbVbY.Ou9U.5U/QY2RMPWu', 'adm');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('adalovelace@example.com', '$2b$10$MXIpfGHiq20TO2/kJxX8deV5Pr2g0WjUbVbY.Ou9U.5U/QY2RMPWu', 'adm');
 INSERT INTO admins (id, name, surname, henkilotunnus, phone, dateofbirth)
-VALUES (1840, 'Ada', 'Lovelace', '101215-L', '184 307 1852', 10/12/1815);
+VALUES (1, 'Ada', 'Lovelace', '101215-L', '184 307 1852', '1815-12-10');
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1924, 'franzkafka@example.com', '$2b$10$MXIpfGHiq20TO2/kJxX8deV5Pr2g0WjUbVbY.Ou9U.5U/QY2RMPWu', 'adm');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('franzkafka@example.com', '$2b$10$MXIpfGHiq20TO2/kJxX8deV5Pr2g0WjUbVbY.Ou9U.5U/QY2RMPWu', 'adm');
 INSERT INTO admins (id, name, surname, henkilotunnus, phone, dateofbirth)
-VALUES (1924, 'Franz', 'Kafka', '030783-K', '+(420) 98 778 9024', 03/07/1883);
+VALUES (2, 'Franz', 'Kafka', '030783-K', '+(420) 98 778 9024', '1883-07-03');
 
 /*docs*/
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1936, 'walterfreeman@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('walterfreeman@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
 INSERT INTO doctors (id, name, surname, henkilotunnus, phone, dateofbirth)
-VALUES (1936, 'Walter', 'Freeman', '141195-F', '350 010 1967', 14/11/1895);
+VALUES (3, 'Walter', 'Freeman', '141195-F', '350 010 1967', '1895-11-14');
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1937, 'ivanpavlov@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('ivanpavlov@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
 INSERT INTO doctors (id, name, surname, henkilotunnus, phone, dateofbirth)
-VALUES (1937, 'Ivan', 'Pavlov', '141149-P', '027 002 1904', 14/11/1849);
+VALUES (4, 'Ivan', 'Pavlov', '141149-P', '027 002 1904', '1849-11-14');
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1990, 'johnbaker@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('johnbaker@example.com', '$2b$10$rON4U8GU4VC3OtAJA/byOOLvdKn0urjzjwMi3EKCVt9sEstWQTsB2', 'doc');
 INSERT INTO doctors (id, name, surname, henkilotunnus, phone, dateofbirth)
-VALUES (1990, 'John', 'Romilly Baker', '010100-B', '023 005 1990', 01/01/1900);
+VALUES (5, 'John', 'Romilly Baker', '010100-B', '023 005 1990', '1900-01-01');
 
 /*patients*/
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1959, 'johnnash@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('johnnash@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (1959, 'John', 'Nash', '130628-N', '195 027 2015', 13/06/1928, 1936);
+VALUES (6, 'John', 'Nash', '130628-N', '195 027 2015', '1928-06-13', 3);
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (323, 'diogenessinopelainen@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('diogenessinopelainen@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (323, 'Diogenes', 'Sinopelainen', '030612-S', '(+30) 00 000 0000', 03/06/412, 1936);
+VALUES (7, 'Diogenes', 'Sinopelainen', '030612-S', '(+30) 00 000 0000', '1412-06-03', 3);
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1888, 'friedrichnietzsche@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('friedrichnietzsche@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (1888, 'Friedrich', 'Nietzsche', '15101844-N', '(+7) 003 1900', 15/10/1844, 1936);
+VALUES (8, 'Friedrich', 'Nietzsche', '15101844-N', '(+7) 003 1900', '1844-10-15', 3);
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1915, 'claraimmerwahr@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('claraimmerwahr@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (1915, 'Clara', 'Immerwahr', '210670-I', '(+49) 001 1915', 21/06/1870, 1936);
+VALUES (9, 'Clara', 'Immerwahr', '210670-I', '(+49) 001 1915', '1870-06-21', 3);
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1810, 'philippepinel@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('philippepinel@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (1810, 'Philippe', 'Pinel', '200445-P', '(+33) 004 1793', 20/04/1745, 1936);
+VALUES (10, 'Philippe', 'Pinel', '200445-P', '(+33) 004 1793', '1745-04-20', 3);
 
-INSERT INTO allusers (user_id, user_email, user_password, user_type)
-VALUES (1650, 'renedescartes@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
+INSERT INTO allusers (user_email, user_password, user_type)
+VALUES ('renedescartes@example.com', '$2b$10$TnjBMPRVFQCH3DsDXHLhieAlKouN9AH6YkYEiTw7zj2PsEPKKA0Fm', 'pot');
 INSERT INTO patients (id, name, surname, henkilotunnus, phone, dateofbirth, doc)
-VALUES (1650, 'Rene', 'Descartes', '310396-D', '(+33) 001 0003', 31/03/1596, 1937);
+VALUES (11, 'Rene', 'Descartes', '310396-D', '(+33) 001 0003', '1596-03-31', 3);
 
 /*metrics*/
 
 INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean)
-VALUES (1959, 1.04, 131, 129, 43, 74, 926);
+VALUES (6, 1.04, 131, 129, 43, 74, 926);
 INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean)
-VALUES (1959, 0.99, 126, 135, 40, 69, 917);
+VALUES (6, 0.99, 126, 135, 40, 69, 917);
 
 /*alarms*/
 
 INSERT INTO alarms (res_id, pat_id, doc_id, pat_check, doc_check)
-VALUES (1, 1959, 1936, false, false);
+VALUES (1, 6, 3, false, false);
 
 INSERT INTO alarms (res_id, pat_id, doc_id, pat_check, doc_check)
-VALUES (2, 1959, 1936, false, false);
+VALUES (2, 6, 3, false, false);
+
+/*ai_res*/
+INSERT INTO ai_results (pat_id, result_status, result_pat_text, result_doc_text, readed)
+VALUES (6, 'normal', 'Continue monitoring and maintain normal activities. Contact a doctor if you experience chest pain or shortness of breath.', 'HRV parameters (SDNN, RMSSD, pNN50) are within normal ranges. Balanced LF/HF ratio suggests stable autonomic activity. No immediate signs of acute cardiac risk based on current data.', 'false')
+
+INSERT INTO ai_results (pat_id, result_status, result_pat_text, result_doc_text, readed)
+VALUES (6, 'normal', 'Continue monitoring. Report any chest discomfort, shortness of breath, or dizziness immediately.', 'HRV parameters (SDNN, RMSSD, pNN50, LF/HF) within normal ranges. No acute indicators observed. Consider reviewing clinical history if symptoms emerge.', 'false')
+

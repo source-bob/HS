@@ -170,3 +170,33 @@
     margin-left: 5%;
     font-size: clamp(10px, 1.75vh, 20px);
 }
+
+.mod12-row {
+    display: flex;
+    margin-top: 1%;
+}
+
+.mod12-table:last-child {
+    margin-bottom: 1%;
+}
+
+.mod12-row-header {
+    width: 50%;
+}
+
+.mod12-row-input {
+    border: 1px solid black;
+    width: 60%;
+}
+
+.mod12-new-pat {
+    width: 60%;
+    background-color: orange;
+    margin-left: 20%;
+    margin-bottom: 2%;
+    box-sizing: border-box;
+}
+
+#luo-uusi-pot {
+    width: 100%;
+}
