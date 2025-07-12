@@ -4,7 +4,11 @@ import {
   selectUserByStatusAndId,
   addUser,
   loadPatientData,
-  deleteUserByID
+  deleteUserByID,
+  getPatAddInfo,
+  getPatientRecom,
+  loadRecomDB,
+  getUserData
 } from '../models/user-model.js';
 import bcrypt from 'bcryptjs';
 
@@ -102,6 +106,73 @@ const getPatients = async (req, res, next) => {
   }
 };
 
+const getUserInfo = async (req, res, next) => {
+  const userID = req.params.id;
+
+  try {
+    const userData = await getUserData(userID);
+
+    if (userData) {
+      console.log(userData);
+      res.status(200).json({ userData: userData });
+    } else {
+      res.status(404).json({ error: 'no data found' });
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+const getPatientInfo = async (req, res, next) => {
+  const patID = req.params.id;
+
+  try {
+    const patInfo = await getPatAddInfo(patID);
+
+    if (patInfo) {
+      console.log(patInfo);
+      res.status(200).json(patInfo);
+    } else {
+      res.status(404).json({message: 'no data found'});
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+const getPatRecomm = async (req, res, next) => {
+  const patID = req.params.id;
+  try {
+    const patRecommendations = await getPatientRecom(patID);
+    if (patRecommendations) {
+      console.log(patRecommendations);
+      res.status(200).json(patRecommendations);
+    } else {
+      res.status(404).json({message: 'no data found'});
+    }
+  } catch (e) {
+    next(e);
+  }
+};
+
+const savePatRecomm = async (req, res, next) => {
+  const userID = req.params.id;
+  const { textData } = req.body;
+  if (!textData) {
+    res.status(400).json({ message: 'add text data' });
+  }
+
+  try {
+    const response = await loadRecomDB(userID ,textData);
+    if (!response || response.error) {
+      res.status(400).json({ message: 'something went wrong, try again.' });
+    }
+    res.status(200).json({ message: 'recom added', response: response });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const getUserByStatusAndId = async (req, res) => {
   const { status, id } = req.params;
 
@@ -125,4 +196,4 @@ const getUserByStatusAndId = async (req, res) => {
 
 
 
-export { getUsers, getPatients, getUserByStatusAndId, newUser, patientData, deleteUser };
+export { getUserInfo ,savePatRecomm ,getPatRecomm, getUsers, getPatients, getUserByStatusAndId, newUser, patientData, deleteUser, getPatientInfo };

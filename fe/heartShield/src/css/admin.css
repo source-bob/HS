@@ -200,3 +200,32 @@
 #luo-uusi-pot {
     width: 100%;
 }
+
+.mod19-body-header {
+    width: 100%;
+    height: 15%;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mod19-body-body {
+    width: 100%;
+    height: 85%;
+    background-color: brown;
+}
+
+.mod19-id-block, .mod19-type-block {
+    display: flex;
+    box-sizing: border-box;
+    width: 20%;
+}
+
+.mod12-row-header {
+    width: 32%;
+}
+
+.mod19-value-block {
+    margin-left: 5%;
+    box-sizing: border-box;
+}

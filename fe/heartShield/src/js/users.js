@@ -1,6 +1,6 @@
 import { fetchData } from "./fetch";
 import { createMod, formatDate } from "./mods";
-import { rebuildAiText, getMetric } from "./hrvAnalyzer";
+import { ahtung, rebuildAiText, getMetric } from "./hrvAnalyzer";
 import { showMessageModal, createButton, selectBlock, getVal, showErrorModal, makeModHeader, userType, userID } from "./mech";
 
 const modBody = document.querySelector('#dia-main-block');
@@ -68,7 +68,21 @@ const countAndFillUsers = async (users) => {
     adminCount.textContent = counts.adm;
 
     return [counts.pot, counts.doc, counts.adm];
-  };
+};
+
+const getPatReccomendations = async (patID) => {
+    const url = `http://localhost:3000/api/users/recom/${patID}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    };
+
+    const userRecomms = await fetchData(url, options);
+
+    return userRecomms;
+};
 
 const getUserInfo = async (userId, userType) => {
 
@@ -148,7 +162,7 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
 
             blockArea.appendChild(displayBlock);
         });
-        addAdmEventListeners();
+        await addAdmEventListeners();
     } else if (blockType === 'doc') {
         blocks.forEach((block) => {
 
@@ -258,31 +272,169 @@ const getAge = async (dateString) => {
 };
 
 const addEventListenersPatient = async () => {
-    const buttonHrv = document.querySelector('#patient-buttons-hrv');
-    const buttonHistoria = document.querySelector('#patient-buttons-historia');
-    const buttonMittari = document.querySelector('#patient-buttons-mittari');
-    const buttonSuosituksia = document.querySelector('#patient-buttons-suosituksia');
-    const buttonAlarm = document.querySelector('#patient-alarm-button');
 
-    buttonHrv.addEventListener('click', () => {
+    const blocks = {
+        butHrv: await selectBlock('patient-buttons-hrv'),
+        butHistoria: await selectBlock('patient-buttons-historia'),
+        butMittari: await selectBlock('patient-buttons-mittari'),
+        butSuosituksia: await selectBlock('patient-buttons-suosituksia'),
+        butAlarm: await selectBlock('patient-alarm-button')
+    };
+
+    blocks.butHrv.addEventListener('click', () => {
         createMod(1);
     });
-    buttonHistoria.addEventListener('click', () => {
-        createMod(2);
+    blocks.butHistoria.addEventListener('click', async () => {
+        await showPatMetrics();
     });
-    buttonMittari.addEventListener('click', () => {
+    blocks.butMittari.addEventListener('click', () => {
         createMod(3);
     });
-    buttonSuosituksia.addEventListener('click', () => {
-        createMod(4);
+    blocks.butSuosituksia.addEventListener('click', async () => {
+        await showPatSuositukset();
     });
-    buttonAlarm.addEventListener('click', () => {
-        createMod(5);
+    blocks.butAlarm.addEventListener('click', async () => {
+        await newAlarmPatient();
     });
 };
 
-const addAdmEventListeners = () => {
-    const newUser = document.querySelector('#adm-new-user');
+const newAlarmPatient = async () => {
+    createMod(5);
+    makeModHeader('X Ilmoita oireista / hätätilanne');
+    const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', 'X Ilmoittaa lääkärille', createPatientAlarm);
+    const diaBody = await selectBlock('dia-main-block');
+    diaBody.appendChild(ilmoitusButton);
+};
+
+const createPatientAlarm = async () => {
+  const mod5 = await selectBlock('mod5');
+  const oireet = [];
+  
+  // Найти все div.mod5-oire внутри mod5
+  const oireBlocks = mod5.querySelectorAll('.mod5-oire');
+  oireBlocks.forEach(oireBlock => {
+    const checkbox = oireBlock.querySelector('input[type="checkbox"]');
+    const label = oireBlock.querySelector('.mod5-oire-header');
+    if (checkbox.checked) {
+      oireet.push(label.textContent.trim());
+    }
+  });
+
+  const oireStr = oireet.join('; ');
+
+
+  // Получить текст из текстового поля
+  const extraText = mod5.querySelector('#mod5-oire-text')?.value.trim() || '';
+
+  console.log(oireStr, extraText);
+
+  const response = await savePatientAlarm(oireStr, extraText);
+
+
+  if (!response || response.error) {
+    showErrorModal(newAlarmPatient, 'something went wrong, try again.', 'X Ilmoita oireista / hätätilanne');
+  }
+};
+
+const savePatientAlarm = async (oireet, userText) => {
+    const userID = localStorage.getItem('user_id');
+    try {
+        const url = `http://localhost:3000/api/ai/${userID}`;
+        const options = {
+            body: JSON.stringify({
+                status: 'warning',
+                patient_instruction: oireet,
+                doctor_note: userText
+            }),
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+        };
+
+        const response = await fetchData(url, options);
+        console.log('INSERTED ID:', response);
+        if (response) {
+            const response2 = await ahtung(response, userID, true);
+            console.log('RESPONSE 2:', response2);
+            if (response2) {
+                showMessageModal('Doctor will be notified mahdollisimman pian.', 'X Ilmoita oireista / hätätilanne');
+                return true;
+            }
+        } else {
+            return false;
+        }
+    } catch (e) {
+        console.error(e.message);
+        return false;
+    }
+};
+
+const showPatSuositukset = async () => {
+    createMod(4);
+    makeModHeader('X Lääkärin suositukset');
+
+    const patRecomendations = await getPatReccomendations(localStorage.getItem('user_id'));
+    console.log(patRecomendations);
+
+    patRecomendations.forEach(async (recommendation) => {
+        const modBody = await selectBlock('dia-main-block');
+        const mod4Row = document.createElement('div');
+        mod4Row.className = 'mod4-row';
+
+        mod4Row.innerHTML = `
+        <div class="sign-block">-</div>
+        <div class="mod4-row-value">${recommendation.rec_text}</div>`;
+
+        modBody.appendChild(mod4Row);
+    });
+};
+
+const showPatMetrics = async () => {
+    createMod(2);
+    const patMetrics = await getMetric(localStorage.getItem('user_id'));
+    console.log(patMetrics);
+
+    makeModHeader(`📜 Mittaushistoria`);
+
+    patMetrics.forEach(async (metric) => {
+        const modBody = await selectBlock('dia-main-block');
+        const mod12Row = document.createElement('div');
+        const fullDate = formatDate(metric.metric_date);
+        const onlyDate = fullDate.split(' klo ')[0];
+        mod12Row.className = 'mod12-row';
+        mod12Row.innerHTML = `
+        <div class="sign-block">📅</div>
+        <div class="mod12-row-cell">
+            <div class="mod12-row-value" id="metric-date-value">${onlyDate}</div>
+        </div>
+        <div class="sign-block">︱</div>
+        <div class="mod12-row-cell">
+            <div class="mod12-row-header">RMSSD:</div>
+            <div class="mod12-row-value" id="metric-rmssd-value">${metric.rmssd}</div>
+        </div>
+        <div class="sign-block">︱</div>
+        <div class="mod12-row-cell">
+            <div class="mod12-row-header">SDNN:</div>
+            <div class="mod12-row-value" id="metric-sdnn-value">${metric.sdnn}</div>
+        </div>
+        <div class="sign-block">︱</div>
+        <div class="mod12-row-cell">
+            <div class="mod12-row-value">${metric.hrv_status}</div>
+        </div>`;
+
+        modBody.appendChild(mod12Row);
+    });
+};
+
+const addAdmEventListeners = async () => {
+    const newUser = await selectBlock('adm-new-user');
+    const findUser = await selectBlock('adm-find-user');
+
+    findUser.addEventListener('click', async () => {
+        await admFindUser();
+    });
 
     newUser.addEventListener('click', async () => {
         await createNewPatient();
@@ -346,20 +498,92 @@ const addDocEventListeners = () => {
             await getPatMittauskaavio(patientID);
         });
 
-        suositukset.addEventListener('click', () => {
-            createMod(11);
+        suositukset.addEventListener('click', async () => {
+            await getPatRecommendations(patientID);
         });
     });
 };
 
+const getPatRecommendations = async (patientID) => {
+    localStorage.setItem('current_patient', patientID);
+    await getPatSuosituksia();
+    return;
+};
+
+const saveNewRecom = async () => {
+    const recomBlock = await selectBlock('mod11-new-suositus');
+    const modHeaderBuild = await selectBlock('dia-header-value');
+    const modHeaderHTML = modHeaderBuild.innerHTML;
+
+    const newRecomm = recomBlock.value.trim();
+
+    if (!newRecomm) {
+        showErrorModal(getPatSuosituksia, 'you have to add recomm.', modHeaderHTML);
+        return false;
+    }
+    const patID = localStorage.getItem('pat_id');
+    try {
+        const url = `http://localhost:3000/api/users/recom/${patID}`;
+        const options = {
+            body: JSON.stringify({
+                textData: newRecomm,
+            }),
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'application/json'
+            },
+        };
+
+        const response = await fetchData(url, options);
+        if (!response) {
+            showErrorModal(getPatSuosituksia, 'something went wrong, try again', modHeaderHTML);
+        } else {
+            showMessageModal('recommendation saved.', modHeaderHTML);
+        }
+        console.log(response);
+        console.log('privet');
+    } catch (err) {
+        showErrorModal(getPatSuosituksia, err, '');
+    }
+};
+
+const getPatSuosituksia = async () => {
+    createMod(11);
+    const patID = localStorage.getItem('current_patient');
+    console.log('SUOSITUKSIA', patID);
+    const patMainData = await getUserInfo(patID, 'pot');
+    const patData = await getPatReccomendations(patID);
+    const lastRecom = patData[0];
+
+    localStorage.setItem('pat_id', patID);
+
+    console.log(lastRecom, patMainData);
+
+    const saveRecommBut = await createButton('mod11-save-recom-but', 'dia-control-button', 'Talenna muutokset', saveNewRecom);
+    diaBody.appendChild(saveRecommBut);
+    const blocks = {
+        last: await selectBlock('mod11-last-suositus'),
+        patName: await selectBlock('but-header-part-name'),
+        patSurname: await selectBlock('but-header-part-surname')
+    };
+
+    blocks.last.textContent = lastRecom.rec_text;
+    blocks.patName.textContent = patMainData.name;
+    blocks.patSurname.textContent = patMainData.surname;
+};
+
 const deleteUserById = async (userId) => {
     try {
-        const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
+        const url = `http://localhost:3000/api/users/${parseInt(userId)}`;
+        const options = {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }, // если API требует это
-        });
+                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            },
+        };
+
+        const response = await fetchData(url, options);
 
         if (!response.ok) {
             console.error(`Ошибка при удалении пользователя ${userId}`);
@@ -445,6 +669,69 @@ const checkDocPatient = async (patientID, docID) => {
             }
         }
     }
+};
+
+const admFindUser = async () => {
+    createMod(18);
+    const modBody = await selectBlock('dia-body');
+    const findButton = await createButton('search-user-but', 'dia-control-button', 'Find', searchAdmUser);
+    modBody.appendChild(findButton);
+};
+
+const searchAdmUser = async () => {
+    const userID = await getVal('search-user-adm');
+    if (!userID || userID.error) {
+        showErrorModal(admFindUser, 'wrong or empty ID', '👤 Find user');
+    } else {
+        const url = `http://localhost:3000/api/users/admin/${userID}`;
+        const options = {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+        };
+
+        const response = await fetchData(url, options);
+
+        if (!response || response.error) {
+            showErrorModal(admFindUser, 'wrong ID, try again', '👤 Find user');
+        } else {
+            await admUserFound(response.userData);
+            return true;
+        }
+    }
+};
+
+const admUserFound = async (userData) => {
+    console.log('USERDATA:', userData);
+    createMod(19);
+
+    const blocks = {
+        id: await selectBlock('mod19-id-value'),
+        type: await selectBlock('mod19-type-value'),
+        name: await selectBlock('mod19-name-value'),
+        email: await selectBlock('mod19-email-value'),
+        phone: await selectBlock('mod19-phone-value'),
+        dob: await selectBlock('mod19-dob-value'),
+        dor: await selectBlock('mod19-dor-value'),
+        ht: await selectBlock('mod19-ht-value'),
+        body: await selectBlock('dia-body')
+    };
+
+    const { userID, userEmail, userType } = userData.mainData;
+    const { dateofbirth, dateofregistration, henkilotunnus, id, name, phone, surname } = userData.addData;
+
+    blocks.id.textContent = userID;
+    blocks.type.textContent = userType;
+    blocks.email.textContent = userEmail;
+    blocks.name.textContent = `${name} ${surname}`;
+    blocks.phone.textContent = phone;
+    blocks.dob.textContent = formatDate(dateofbirth);
+    blocks.dor.textContent = formatDate(dateofregistration);
+    blocks.ht.textContent = henkilotunnus;
+
+    const backButton = await createButton('mod19-back-button', 'dia-control-button', 'Find another', admFindUser);
+    blocks.body.appendChild(backButton);
 };
 
 const createNewPatient = async () => {
@@ -683,16 +970,51 @@ const attachMetricsNavigation = (blocks, metrics) => {
 };
 
 const getPatTautihistoria = async (patID) => {
+    
     const patientInfo = await getUserInfo(patID, 'pot');
     createMod(9);
 
     const blocks = {
-        pot_name: document.querySelector('#but-header-part-name'),
-        pot_surname: document.querySelector('#but-header-part-surname'),
+        pot_name: await selectBlock('but-header-part-name'),
+        pot_surname: await selectBlock('but-header-part-surname'),
+        pot_mi: await selectBlock('mod9-mi-value'),
+        pot_reg: await selectBlock('mod9-reg-value'),
+        pot_pills: await selectBlock('mod9-pills-value'),
+        pot_ai: await selectBlock('mod9-ai-value'),
+        dia_body: await selectBlock('dia-body'),
     };
+    console.log('patientINFO:', patientInfo);
+
+    const patientAddInfo = await getPatAddInfo(patID);
+    if (!patientAddInfo || patientAddInfo.error) {
+        diaBody.textContent = 'No data found';
+    }
+
+    const aiReports = await getFullAiResponse(patID);
+
 
     blocks.pot_name.textContent = patientInfo.name;
     blocks.pot_surname.textContent = patientInfo.surname;
+    blocks.pot_mi.textContent = formatDate(patientAddInfo.mi_date);
+    blocks.pot_ai.textContent = `${aiReports.length} kpl`;
+    blocks.pot_pills.textContent = patientAddInfo.pills;
+    blocks.pot_reg.textContent = formatDate(patientInfo.dateofregistration);
+
+    console.log(patientInfo);
+};
+
+const getPatAddInfo = async (patID) => {
+    const url = `http://localhost:3000/api/users/info/${patID}`;
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+    };
+
+    const result = await fetchData(url, options);
+
+    return result;
 };
 
 const getPatAIreports = async (patID) => {
@@ -768,11 +1090,5 @@ const attachReportNavigation = (blocks, reports) => {
 
     update(); // начальная отрисовка
 };
-
-
-
-
-const getPatSuositukset = async (patID, amount) => {};
-  
 
 export { getUsers, fillUserData, fillPatientData, addEventListenersPatient, getUserInfo, getLastAiResponse, getFullAiResponse };

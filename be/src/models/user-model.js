@@ -191,6 +191,82 @@ const loadPatientData = async (data) => {
   }
 };
 
+const loadRecomDB = async (userID ,textData) => {
+  const sql = `
+    INSERT INTO patientrecomm (rec_patientid, rec_text)
+    VALUES (?, ?)`;
+  const params = [userID, textData];
+  try {
+    const [result] = await promisePool.query(sql, params);
+    if (result.affectedRows === 1) {
+      return true;
+    } else {
+      return { error: 'Failed to insert recomm.' };
+    }
+  } catch (e) {
+    console.error('error:', e.message);
+    return { error: e.message };
+  }
+};
+
+const getUserData = async (userID) => {
+  try {
+    const sql = `SELECT * FROM allusers WHERE user_id = ?`;
+    const params = [userID];
+
+    const [result] = await promisePool.query(sql, params);
+    const addData = await selectUserByStatusAndId(result[0].user_type, userID);
+
+    const mainData = {
+      userID: result[0].user_id,
+      userEmail: result[0].user_email,
+      userType: result[0].user_type
+    }
+
+    console.log(addData);
+
+    return {mainData: mainData, addData: addData };
+  } catch (e) {
+    console.error('error:', e.message);
+    return { error: e.message };
+  }
+};
+
+const getPatientRecom = async (patID) => {
+  try {
+    const sql = `
+    SELECT * FROM patientrecomm
+    WHERE rec_patientid = ?
+    ORDER BY rec_date DESC`;
+
+    const options = [patID];
+
+    const [result] = await promisePool.query(sql, options);
+
+    return result;
+  } catch (e) {
+    console.error('error', e.message);
+    return { error: e.message };
+  }
+};
+
+const getPatAddInfo = async (patID) => {
+  console.log(patID);
+  try {
+    const sql = `
+    SELECT * FROM pat_data
+    WHERE pat_id = ?`;
+
+    const params = [patID];
+
+    const [result] =  await promisePool.query(sql, params);
+    return result[0];
+  } catch (e) {
+    console.error('error', e.message);
+    return { error: e.message };
+  }
+};
+
 const getAllUsers = async () => {
   try {
     const [users] = await promisePool.query(`
@@ -248,4 +324,4 @@ const selectUserByStatusAndId = async (status, id) => {
   return rows[0];
 };
 
-export { selectUserByEmail, getAllUsers, getDocPatients, selectUserByStatusAndId, addUser, loadPatientData, deleteUserByID };
+export { getUserData, loadRecomDB, getPatientRecom, getPatAddInfo, selectUserByEmail, getAllUsers, getDocPatients, selectUserByStatusAndId, addUser, loadPatientData, deleteUserByID };

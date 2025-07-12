@@ -57,6 +57,7 @@ body {
 .header-logo {
     width: 10%;
     height: 100%;
+    min-width: 70px;
     background-color: brown;
 }
 
@@ -141,7 +142,7 @@ button {
     src: url('../fonts/Lexend/Lexend-VariableFont_wght.ttf') format('truetype');
     font-weight: 100 900; /* укажи диапазон весов */
     font-style: normal;
-    font-size: 100%;
+    font-size: 90%;
     height: 35px;
     margin-top: auto;
     margin-bottom: auto;
@@ -205,8 +206,8 @@ button:disabled {
 }
 
 .dia-control-button {
-    width: 40%;
-    margin-left: 30%;
+    width: 60%;
+    margin-left: 20%;
     margin-bottom: 2%;
 }
 

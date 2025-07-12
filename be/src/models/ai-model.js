@@ -187,4 +187,4 @@ const testMakeResearch = async() => {
 //testMakeResearch();
 
 
-export { makeResearch, getPatAiRes, fullAiRes };
+export { saveAiResponseToDatabase, makeResearch, getPatAiRes, fullAiRes };

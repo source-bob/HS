@@ -178,6 +178,7 @@
 .data-block {
     text-align: left;
     width: 100%;
+    background-color: brown;
 }
 
 .mod8-buttons {
@@ -237,6 +238,31 @@
     width: 100%;
 }
 
+.mod11-suositus-block {
+    display: flex;
+    width: 100%;
+    background-color: green;
+}
+
+.mod11-data-part {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mod11-value-row {
+    margin-left: 3%;
+    width: 97%;
+    background-color: blue;
+    box-sizing: border-box;
+    min-height: 30px;
+}
+
+#mod11-new-suositus {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1%;
+}
+
 .mod12-row {
     display: flex;
     margin-top: 1%;
@@ -261,6 +287,10 @@
     margin-left: 20%;
     margin-bottom: 2%;
     box-sizing: border-box;
+}
+
+.mod12-row-value {
+    background-color: green;
 }
 
 #luo-uusi-pot {

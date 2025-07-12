@@ -58,3 +58,21 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:3000/api/users/30
+
+
+###
+GET http://localhost:3000/api/users/info/11
+
+###
+GET http://localhost:3000/api/users/recom/6
+
+###
+
+POST http://localhost:3000/api/ai/6
+Content-Type: application/json
+
+{
+    "status": "warning",
+    "patient_instruction": "empty",
+    "doctor_note": "pääkipu, rintakipu. Patient ilmoittanut oireeista, tarvi lääkärin tarkistusta."
+}

@@ -1,10 +1,10 @@
 import promisePool from "../utils/database.js";
 
 const saveMetricToDatabase = async (userId, userData) => {
-  const { sdnn, rmssd, pnn50, lfhf, rr_mean, hr } = userData;
-  const sql = `INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean)
-              VALUES (?, ?, ?, ?, ?, ?, ?)`;
-  const params = [userId , lfhf, sdnn, rmssd, pnn50, hr, rr_mean];
+  const { sdnn, rmssd, pnn50, lfhf, rr_mean, hr, hrv } = userData;
+  const sql = `INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean, hrv)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const params = [userId , lfhf, sdnn, rmssd, pnn50, hr, rr_mean, hrv];
 
   console.log('USER DATA FOR SAVING:', userId, userData)
 

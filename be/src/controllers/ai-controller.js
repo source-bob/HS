@@ -1,4 +1,4 @@
-import { makeResearch, getPatAiRes, fullAiRes } from '../models/ai-model.js';
+import { saveAiResponseToDatabase, makeResearch, getPatAiRes, fullAiRes } from '../models/ai-model.js';
 
 const analyze = async (req, res, next) => {
   try {
@@ -8,6 +8,16 @@ const analyze = async (req, res, next) => {
   } catch (e) {
     next(e);
     return;
+  }
+};
+
+const saveAIres = async (req, res, next) => {
+  try {
+    const userID = req.params.id;
+    const response = await saveAiResponseToDatabase(userID, req.body);
+    res.status(200).json(response);
+  } catch (e) {
+    next(e);
   }
 };
 
@@ -31,4 +41,4 @@ const getFullAiRes = async (req, res, next) => {
   }
 };
 
-export { analyze, getAiRes, getFullAiRes };
+export { saveAIres, analyze, getAiRes, getFullAiRes };

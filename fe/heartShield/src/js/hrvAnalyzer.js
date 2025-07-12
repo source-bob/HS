@@ -1,6 +1,7 @@
 import HRVState from './hrvState.js';
 import { fetchData } from './fetch.js';
 import { createMod } from './mods.js';
+import { selectBlock } from './mech.js';
 
 let lastAIRequestTimestamp = 0;
 let lastSaveTimestamp = 0;
@@ -24,23 +25,29 @@ async function monitorHRVStatus() {
 
         if (currentStatus === "Normaali HRV") {
             if (now - lastSaveTimestamp >= SAVE_INTERVAL_MS) {
-                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate);
+                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate, currentStatus);
                 lastSaveTimestamp = now;
             }
-        } else if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS) {
+        } else if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS && currentStatus !== 'Normaali HRV') {
             console.log('SENDING METRICS TO AI, STEP 1');
+            
             await sendMetricsToAI(currentMetrics, userId, userAge);
             lastAIRequestTimestamp = now;
         } else {
             console.log('AI Cooldown');
         }
+
+        if (now - lastSaveTimestamp >= SAVE_INTERVAL_MS) {
+                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate, currentStatus);
+            }
     }, 5000); // проверяем каждые 5 секунд
 };
 
-async function saveMetricsToDatabase(userId, metrics, hr) {
+async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
     // Здесь заглушка вместо реальной базы
     console.log('💾 Сохраняем метрики в базу данных:', metrics);
     metrics.hr = hr;
+    metrics.hrv = hrv.split(' ( ')[0];
 
     const url = `http://localhost:3000/api/metrics/${userId}/`;
     const options = {
@@ -98,11 +105,18 @@ async function handleAiResponse(data, userId) {
         if (mainContent.status === 'critical') {
             await alarm(mainContent, userId);
         } else if (mainContent.status === 'warning') {
-            await warning(mainContent);
+            await warning(mainContent, userId);
         } else {}
     } catch (e) {
         console.error('error:', e);
     }
+};
+
+async function warning(data, userID) {
+    const modWindow = await selectBlock('main-dialog');
+    modWindow.close();
+    ahtung(data.inserted_id, userID, true);
+    return true;
 };
 
 async function alarm(data, userId) {
@@ -124,6 +138,7 @@ async function alarm(data, userId) {
 
     button.addEventListener('click', () => {
         clearInterval(timerInterval);
+        ahtung(data.inserted_id, userId, true);
         modWindow.close(); // пользователь нажал кнопку — отменяем тревогу
     });
 
@@ -153,6 +168,11 @@ async function ahtung(insertedID, userID, answered) {
         };
 
         const userData = await fetchData(url, options);
+        if (userData) {
+            return true;
+        } else {
+            return false;
+        }
     } catch (e) {
         console.error('mistake "ahtung!"', e);
     }
@@ -177,4 +197,4 @@ async function getMetric(patID) {
 };
 
 
-export { monitorHRVStatus, rebuildAiText, getMetric };
+export { ahtung, monitorHRVStatus, rebuildAiText, getMetric };

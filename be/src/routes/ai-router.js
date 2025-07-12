@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { authenticateToken } from '../middlewares/authentication.js';
-import { analyze, getAiRes, getFullAiRes } from '../controllers/ai-controller.js';
+import { saveAIres, analyze, getAiRes, getFullAiRes } from '../controllers/ai-controller.js';
 
 const aiRouter = express.Router();
 
@@ -10,9 +10,10 @@ aiRouter.route('/')
   .post(authenticateToken, analyze);
 
 aiRouter.route('/:id')
-  .get(authenticateToken, getAiRes);
+  .get(authenticateToken, getAiRes)
+  .post(saveAIres);
 
 aiRouter.route('/full/:id')
-    .get(authenticateToken, getFullAiRes);
+  .get(authenticateToken, getFullAiRes);
 
 export default aiRouter;

@@ -39,6 +39,7 @@ const createMod = async (number) => {
 
     const modWindow = document.querySelector('#main-dialog');
     const closeDialogButton = document.querySelector('#close-dialog-button');
+    closeDialogButton.textContent = '🔙 Close';
     const modBody = document.querySelector('#dia-main-block');
     const modHeader = document.querySelector('#dia-header-value');
 
@@ -105,7 +106,7 @@ const createMod = async (number) => {
             }
         });
     } else if (number === 2) {
-        modBody.textContent = 'second';
+        modBody.textContent = '';
     } else if (number === 3) {
         modHeader.textContent = 'Mittari';
         modBody.innerHTML = `
@@ -125,9 +126,42 @@ const createMod = async (number) => {
         populateDeviceList();
 
     } else if (number === 4) {
-        modBody.textContent = 'fourth';
+        modBody.textContent = '';
     } else if (number === 5) {
-        modBody.textContent = 'fith';
+        modBody.innerHTML = `
+        <div class="mod5" id="mod5">
+            <div class="sign-block">X</div>
+            <div class="mod5-body">
+                <div class="mod5-body-header">Valitse oire(ta)</div>
+                <div class="mod5-body-body">
+                    <div class="mod12-row">
+                        <div class="mod5-oire">
+                            <input type="checkbox" />
+                            <div class="mod5-oire-header">Rintakipu</div>
+                        </div>
+                        <div class="mod5-oire">
+                            <input type="checkbox" />
+                            <div class="mod5-oire-header">Huimaus</div>
+                        </div>
+                    </div>
+                    <div class="mod12-row">
+                        <div class="mod5-oire">
+                            <input type="checkbox" />
+                            <div class="mod5-oire-header">Hengitysvaikeudet</div>
+                        </div>
+                        <div class="mod5-oire">
+                            <input type="checkbox" />
+                            <div class="mod5-oire-header">Nopeutunut syke</div>
+                        </div>
+                    </div>
+                    <div class="mod12-row">
+                        <div class="mod5-oiretext">
+                            <input type="textarea" id="mod5-oire-text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
     } else if (number === 6) {
         console.log('mod 6');
 
@@ -235,6 +269,29 @@ const createMod = async (number) => {
                 <div class="but-header-part-part" id="but-header-part-surname"></div>
             </div>
         </div>`;
+        modBody.innerHTML = `
+        <div class="mod12-table">
+            <div class="mod12-row">
+                <div class="sign-block">📅</div>
+                <div class="mod12-row-header">Infarkti:</div>
+                <div class="mod12-row-value" id="mod9-mi-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">🔍</div>
+                <div class="mod12-row-header">HRV-seuranta aloitettu:</div>
+                <div class="mod12-row-value" id="mod9-reg-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">💊</div>
+                <div class="mod12-row-header">Lääkitys:</div>
+                <div class="mod12-row-value" id="mod9-pills-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">📄</div>
+                <div class="mod12-row-header">Edelliset AI-raportit:</div>
+                <div class="mod12-row-value" id="mod9-ai-value"></div>
+            </div>
+        </div>`;
     } else if (number === 10) {
         modHeader.innerHTML = `
         <div class="sign-block">📊</div>
@@ -275,7 +332,33 @@ const createMod = async (number) => {
             </div>
         </div>`;
     } else if (number === 11) {
-        modBody.textContent = 'MOD 11';
+        modHeader.innerHTML = `
+        <div class="sign-block">📊</div>
+        <div class="doc-but-dia-header">
+            <div class="doc-but-header-part">X Muokkaa suosituksia</div>
+            <div class="doc-but-header-part">
+                <div class="but-header-part-part">Potilas:</div>
+                <div class="but-header-part-part" id="but-header-part-name"></div>
+                <div class="but-header-part-part" id="but-header-part-surname"></div>
+            </div>
+        </div>`;
+        modBody.innerHTML = `
+        <div class="mod11-suositus-block">
+            <div class="sign-block">X</div>
+            <div class="mod11-data-part">
+                <div class="mod11-row-header">Nykyinen hoitosuositus:</div>
+                <div class="mod11-value-row" id="mod11-last-suositus">Suositus</div>
+            </div>
+        </div>
+        <div class="mod11-suositus-block">
+            <div class="sign-block">X</div>
+            <div class="mod11-data-part">
+                <div class="mod11-row-header">Uusi suositus:</div>
+                <div class="mod11-value-row">
+                    <input id="mod11-new-suositus">
+                </div>
+            </div>
+        </div>`;
     } else if (number === 12) {
         
         userLvl === 'doc'
@@ -383,6 +466,61 @@ const createMod = async (number) => {
             <div class="mod12-row-header">Patient ID:</div>
             <input type="text" class="mod12-row-input" id="delete-pot-id" required />
             <div class="sign-block">*</div>
+        </div>`;
+    } else if (number === 18) {
+        console.log('mod18');
+        makeModHeader('👤 Find user');
+        modBody.innerHTML = `
+        <div class="mod12-row">
+            <div class="sign-block">X</div>
+            <div class="mod12-row-header">User ID:</div>
+            <input type="text" class="mod12-row-input" id="search-user-adm" />
+        </div>`;
+    } else if (number === 19) {
+        console.log('MOD19');
+        makeModHeader('👤 Find user');
+        modBody.innerHTML = `
+        <div class="mod19-body-header">
+            <div class="mod19-id-block">
+                <div class="mod19-header-block">ID:</div>
+                <div class="mod19-value-block" id="mod19-id-value"></div>
+            </div>
+            <div class="mod19-type-block">
+                <div class="mod19-header-block">type:</div>
+                <div class="mod19-value-block" id="mod19-type-value"></div>
+            </div>
+        </div>
+        <div class="mod19-body-body">
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">name:</div>
+                <div class="mod12-row-value" id="mod19-name-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">email:</div>
+                <div class="mod12-row-value" id="mod19-email-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">phone:</div>
+                <div class="mod12-row-value" id="mod19-phone-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">date of birth:</div>
+                <div class="mod12-row-value" id="mod19-dob-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">date of reg:</div>
+                <div class="mod12-row-value" id="mod19-dor-value"></div>
+            </div>
+            <div class="mod12-row">
+                <div class="sign-block">X</div>
+                <div class="mod12-row-header">henkilotunnus:</div>
+                <div class="mod12-row-value" id="mod19-ht-value"></div>
+            </div>
         </div>`;
     }
 

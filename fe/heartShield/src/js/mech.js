@@ -19,9 +19,11 @@ const showMessageModal = async (message = 'Mistake ', header) => {
     const diaBody = await selectBlock('dia-body');
     const modBody = await selectBlock('dia-main-block');
 
-    diaHeader.innerHTML = `<div>${header}</div>`;
+    diaHeader.innerHTML = `${header}`;
     modBody.innerHTML = `<div>${message}</div>`;
 };
+
+const createRow12 = async () => {};
 
 const selectBlock = async (blockID) => document.querySelector(`#${blockID}`);
 
@@ -32,7 +34,7 @@ const showErrorModal = async (callback, message = 'Mistake ', header) => {
     const diaBody = await selectBlock('dia-body');
     const modBody = await selectBlock('dia-main-block');
 
-    diaHeader.innerHTML = `<div>${header}</div>`;
+    diaHeader.innerHTML = `${header}`;
     modBody.innerHTML = `<div>${message}</div>`;
     const okButton = await createButton('ok-back-button', 'dia-control-button', 'oki', callback);
     diaBody.appendChild(okButton);

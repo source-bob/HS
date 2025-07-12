@@ -192,3 +192,41 @@
     width: 100%;
     padding: 2%;
 }
+
+.mod12-row {
+    display: flex;
+    font-size: 90%;
+    justify-content: space-between;
+}
+
+.mod12-row-cell {
+    display: flex;
+    width: calc(90%/4)
+}
+
+.mod4-row {
+    display: flex;
+}
+
+.mod5 {
+    display: flex;
+    margin-bottom: 5%;
+}
+
+.mod5-oire {
+    font-size: 90%;
+    display: flex;
+    width: 50%;
+}
+
+.mod5-body {
+    width: 100%;
+}
+
+.mod5-oiretext {
+    width: 100%;
+}
+
+#mod5-oire-text {
+    width: 85%;
+}
