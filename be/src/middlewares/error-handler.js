@@ -32,9 +32,11 @@ const validationErrorHandler = (req, res, next) => {
     error.errors = errors.array({onlyFirstError: true}).map((error) => {
       return {field: error.path, message: error.msg};
     });
+    console.log('ERROR!:', errors);
     return next(error);
   }
   next();
 };
+
 
 export { notFoundHandler, errorHandler, validationErrorHandler, customError }

@@ -326,7 +326,7 @@ const createPatientAlarm = async () => {
   // Получить текст из текстового поля
   const extraText = mod5.querySelector('#mod5-oire-text')?.value.trim() || '';
 
-  console.log(oireStr, extraText);
+  console.log(oireet, extraText);
 
   const response = await savePatientAlarm(oireStr, extraText);
 
@@ -840,7 +840,7 @@ const loadNewUser = async () => {
         return;
     }
 
-    console.log('Данные пациента:', user);
+    console.log('USER DATA:', user);
 
     try {
         const url = `http://localhost:3000/api/users/`;

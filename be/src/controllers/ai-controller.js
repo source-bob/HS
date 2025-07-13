@@ -15,6 +15,7 @@ const saveAIres = async (req, res, next) => {
   try {
     const userID = req.params.id;
     const response = await saveAiResponseToDatabase(userID, req.body);
+    console.log('SAVE AI RESPONSE:', response);
     res.status(200).json(response);
   } catch (e) {
     next(e);

@@ -37,8 +37,8 @@ Content-Type: application/json
     "name": "Jack",
     "surname": "Jackson",
     "birthday": "1992-02-09",
-    "ht": "090292-777D",
-    "phone": "046-633-99-65",
+    "ht": "090292777D",
+    "phone": "0466339965",
     "email": "jackson@example.com",
     "pass": "adminpass",
     "user_type": "adm",
@@ -73,6 +73,29 @@ Content-Type: application/json
 
 {
     "status": "warning",
-    "patient_instruction": "empty",
-    "doctor_note": "pääkipu, rintakipu. Patient ilmoittanut oireeista, tarvi lääkärin tarkistusta."
+    "patient_instruction": "rintakipu, pääkipu",
+    "doctor_note": "Patient ilmoittanut oireeista, tarvi lääkärin tarkistusta."
+}
+
+
+###
+POST http://localhost:3000/api/users/recom/6
+Content-Type: application/json
+
+{
+    "textData": "Testi recommendation"
+}
+
+###
+POST http://localhost:3000/api/metrics/6
+Content-Type: application/json
+
+{
+    "sdnn": 131,
+    "rmssd": 131,
+    "pnn50": 31,
+    "lfhf": 1.31,
+    "rr_mean": 931,
+    "hr": 91,
+    "hrv": "Normaali"
 }

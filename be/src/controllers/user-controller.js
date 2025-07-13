@@ -156,6 +156,7 @@ const getPatRecomm = async (req, res, next) => {
 };
 
 const savePatRecomm = async (req, res, next) => {
+  console.log('privet check');
   const userID = req.params.id;
   const { textData } = req.body;
   if (!textData) {
@@ -196,4 +197,4 @@ const getUserByStatusAndId = async (req, res) => {
 
 
 
-export { getUserInfo ,savePatRecomm ,getPatRecomm, getUsers, getPatients, getUserByStatusAndId, newUser, patientData, deleteUser, getPatientInfo };
+export { getUserInfo, savePatRecomm, getPatRecomm, getUsers, getPatients, getUserByStatusAndId, newUser, patientData, deleteUser, getPatientInfo };

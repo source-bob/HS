@@ -141,6 +141,7 @@ function extractFinalJSON(aiResponse) {
   return null;
 };
 
+/*
 const testUserData = {
   userId: '12345',
   metrics: { sdnn: 50, rmssd: 40, pnn50: 61, lfhf: 1.02, mean_rr: 0.9 },  // пример метрик
@@ -185,6 +186,6 @@ const testMakeResearch = async() => {
 
 // Вызов теста
 //testMakeResearch();
-
+*/
 
 export { saveAiResponseToDatabase, makeResearch, getPatAiRes, fullAiRes };
