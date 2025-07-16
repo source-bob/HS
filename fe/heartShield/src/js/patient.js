@@ -4,6 +4,10 @@ import { debugMovesenseCharacteristics } from './debugBLE';
 import HRVState from './hrvState.js';
 import { createMod } from './mods.js';
 import { savePos } from './geo.js';
+import { logout } from './auth.js';
+
+const mainLogoutButton = document.querySelector('#logout');
+mainLogoutButton.addEventListener('click', logout);
 
 window.debugMovesenseCharacteristics = debugMovesenseCharacteristics;
 

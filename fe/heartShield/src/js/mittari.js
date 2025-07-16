@@ -22,11 +22,12 @@ async function scanAvailableDevices() {
 
         device.addEventListener('gattserverdisconnected', async () => {
             console.warn('🔌 Устройство отключено, пытаемся переподключиться...');
-            await reconnectDevice(device);
+            reconnectWithRetry(device);
         });
 
         // 🚀 Запускаем слушателя данных
         await startHRVDataListener(server);
+        await startRRBufferMonitor();
 
         return [{
             name: device.name || 'Tuntematon laite',
@@ -44,23 +45,26 @@ async function scanAvailableDevices() {
 let hrChar = null;
 let handleHRValueChanged = null;
 
-async function reconnectDevice(device) {
-    try {
-        console.log('🔄 Пытаемся переподключиться...');
-
-        if (!device.gatt.connected) {
+async function reconnectWithRetry(device, maxAttempts = 5, delay = 2000) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            console.log(`🔄 Попытка ${attempt} переподключения...`);
             const server = await device.gatt.connect();
-            connectedServer = server; // Обновляем глобальную переменную
+            connectedServer = server;
             await startHRVDataListener(server);
             await startRRBufferMonitor();
-            console.log('✅ Переподключение выполнено успешно');
-        } else {
-            console.log('🔗 Устройство уже подключено');
+            if (server) {
+                console.log('✅ Успешно переподключено!', server);
+            } else {
+                attempt ++;
+            }
+            return;
+        } catch (err) {
+            console.warn(`⏳ Не удалось подключиться (попытка ${attempt}), ждём...`);
+            await new Promise(res => setTimeout(res, delay));
         }
-
-    } catch (error) {
-        console.error('❌ Ошибка переподключения:', error);
     }
+    console.error('❌ Переподключение не удалось после всех попыток');
 };
 
 async function populateDeviceList() {
@@ -72,8 +76,8 @@ async function populateDeviceList() {
         if (devices[0].connected) {
             const deviceStatus = document.querySelector('#dia-mittari-status');
             const mainDeviceStatus = document.querySelector('#patient-info-mittari-value');
-            mainDeviceStatus.textContent = 'Connected';
-            deviceStatus.textContent = 'Connected';
+            mainDeviceStatus.textContent = '🟢 Connected';
+            deviceStatus.textContent = '🟢 Connected';
         }
     });
 };
@@ -81,7 +85,14 @@ async function populateDeviceList() {
 async function startHRVDataListener(server) {
     try {
         const hrService = await server.getPrimaryService('heart_rate');
+        if (hrService) {
+            console.log('HR_service:', hrService);
+        }
         hrChar = await hrService.getCharacteristic('heart_rate_measurement');
+        if (hrChar) {
+            console.log('HR_char:', hrChar);
+            console.log('hr_char properties:', hrChar.properties);
+        }
 
         // Удаляем старый обработчик, если он был
         if (handleHRValueChanged) {
@@ -90,7 +101,10 @@ async function startHRVDataListener(server) {
 
         // Объявляем и сохраняем новый обработчик
         handleHRValueChanged = (event) => {
-            const data = parseHeartRateWithRR(event.target.value);
+            const value = event.target.value;
+            const rawData = new Uint8Array(value.buffer);
+            console.log('RAW HR DATA:', rawData);
+            const data = parseHeartRateWithRR(value);
             console.log(`❤️ Syke (Heart Rate): ${data.heartRate} bpm`);
 
             HRVState.setHeartRate(data.heartRate);
@@ -101,7 +115,7 @@ async function startHRVDataListener(server) {
                 const metrics = updateRRMetrics(data.rrIntervals);
                 if (metrics) {
                     const hrvStatus = classifyHRV(metrics.sdnn);
-                    console.log(`📊 HRV-metriikat: SDNN=${metrics.sdnn}, RMSSD=${metrics.rmssd}, pNN50=${metrics.pnn50}%, ${metrics.rrMean}`);
+                    console.log(`📊 HRV-metriikat: SDNN=${metrics.sdnn}, RMSSD=${metrics.rmssd}, pNN50=${metrics.pnn50}%, RR-mean=${metrics.rr_mean}, lf_hf=${metrics.lf_hf}`);
                     console.log('🧬 HRV-tulkinta:', hrvStatus);
 
                     HRVState.setRRMetrics(metrics);
@@ -109,11 +123,11 @@ async function startHRVDataListener(server) {
                 }
             } else {
                 console.log('RR-intervallit eivät ole saatavilla');
-                return;
             }
         };
 
         await hrChar.startNotifications();
+        console.log('NOTIFICATIONS STARTED');
         hrChar.addEventListener('characteristicvaluechanged', handleHRValueChanged);
 
     } catch (err) {
@@ -122,9 +136,9 @@ async function startHRVDataListener(server) {
 };
 
 function classifyHRV(sdnn) {
-    if (sdnn < 50) return "Alhainen HRV (riski)";
-    if (sdnn < 100) return "Normaali HRV";
-    return "Korkea HRV (erinomainen)";
+    if (sdnn < 50) return "Alhainen";
+    if (sdnn < 100) return "Normaali";
+    return "Korkea";
 };
 
 let hrvCheckInterval = null;
@@ -152,6 +166,10 @@ function parseHeartRateWithRR(dataView) {
     const flags = dataView.getUint8(0);
     const hrFormat16Bit = flags & 0x01;
     const rrIntervalFlag = flags & 0x10;
+
+    console.log('💡 HR Flags:', flags.toString(2).padStart(8, '0'));
+    console.log('↪ RR Present:', !!rrIntervalFlag);
+    console.log('📦 Data byteLength:', dataView.byteLength);
 
     // Считываем пульс
     let heartRate;
@@ -215,7 +233,7 @@ function updateRRMetrics(newRRs) {
         console.log(`⚡ LF/HF-suhde: ${lfHfRatio}`);
     }
 
-    return { sdnn: Math.round(sdnn), rmssd: Math.round(rmssd), pnn50: Math.round(pnn50), lfhf: lfHfRatio, rr_mean: Math.round(mean) };
+    return { sdnn: Math.round(sdnn), rmssd: Math.round(rmssd), pnn50: Math.round(pnn50), lf_hf: parseFloat(lfHfRatio), rr_mean: Math.round(mean) };
 };
 
 function calculateLFHFRatio(rrIntervals) {

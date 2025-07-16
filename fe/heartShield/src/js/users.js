@@ -137,11 +137,11 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
         let statusName;
         blocks.forEach((block) => {
             if (block.user_type === 'pot') {
-                statusName = 'Patient:';
+                statusName = '📋 Patient:';
             } else if (block.user_type === 'doc') {
-                statusName = 'Doctor:';
+                statusName = '🩺 Doctor:';
             } else if (block.user_type === 'adm') {
-                statusName = 'Admin:';
+                statusName = '🔧 Admin:';
             }
 
             const displayBlock = document.createElement('div');
@@ -154,17 +154,37 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
             </div>
             <div class="user-id-block">
                 <div class="user-id-header">ID:</div>
-                <div class="user-id-value">${block.user_id}</div>
+                <div class="user-id-value" id="patient-block-header-id-value">${block.user_id}</div>
             </div>
             <div class="del-button-block">
-                <button class="del-user-button">Poista käyttäjä</div>
+                <button class="del-user-button">❌ Delete user</div>
             </div>`;
 
             blockArea.appendChild(displayBlock);
         });
         await addAdmEventListeners();
     } else if (blockType === 'doc') {
-        blocks.forEach((block) => {
+        for (const block of blocks) {
+            let hrvSign = '🔘';
+            let hrvStatus = 'Not Availible';
+            let rmssdValue = '-';
+            let sdnnValue = '-';
+            const metrics = await getMetric(block.id);
+            if (metrics[0]) {
+                const userHrv = metrics[0].hrv_status;
+                if (userHrv === 'Alhainen') {
+                    hrvSign = '🔴';
+                } else if (userHrv === 'Normaali') {
+                    hrvSign = '🟢';
+                } else if (userHrv === 'Korkea') {
+                    hrvSign = '🔵';
+                }
+                hrvStatus = userHrv;
+                rmssdValue = metrics[0].rmssd;
+                sdnnValue = metrics[0].sdnn;
+            }
+
+            
 
             const blockBody = document.createElement('div');
             blockBody.className = 'patient-block';
@@ -172,7 +192,7 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
             blockBody.innerHTML = `
             <div class="patient-block-header">
                 <div class="patient-block-header-status-name">
-                    <div class="patient-block-header-status">Patient:</div>
+                    <div class="patient-block-header-status">📋 Potilas:</div>
                     <div class="patient-block-header-name">${block.name} ${block.surname}</div>
                 </div>
                 <div class="patient-block-header-id">
@@ -181,22 +201,22 @@ const createBlocks = async (blocks, blockType, blockTarget) => {
                 </div>
             </div>
             <div class="patient-block-hrv">
-                <div class="patient-block-hrv-header">HRV:</div>
-                <div class="patient-block-hrv-value">Tähän tulee mittauksia</div>
+                <div class="patient-block-hrv-header">${hrvSign} HRV:</div>
+                <div class="patient-block-hrv-value">${hrvStatus} (SDNN = ${sdnnValue}, RMSSD = ${rmssdValue})</div>
             </div>
             <div class="patient-block-buttons">
                 <div class="patient-block-buttons-part">
-                    <button class="patient-block-button" id="patient-ai-reports">Näytä AI-raportti</button>
-                    <button class="patient-block-button" id="patient-tautihistoria">Tautihistoria</button>
+                    <button class="patient-block-button" id="patient-ai-reports">🤖 Näytä AI-raportti</button>
+                    <button class="patient-block-button" id="patient-tautihistoria">📖 Tautihistoria</button>
                 </div>
                 <div class="patient-block-buttons-part">
-                    <button class="patient-block-button" id="patient-mittaukset">Potilaan mittauskaavio</button>
-                    <button class="patient-block-button" id="patient-suositukset">Lisää/muokkaa suosituksia</button>
+                    <button class="patient-block-button" id="patient-mittaukset">📈 Potilaan mittauskaavio</button>
+                    <button class="patient-block-button" id="patient-suositukset">✍️ Lisää/muokkaa suosituksia</button>
                 </div>
             </div>`;
             
             blockArea.appendChild(blockBody);
-        });
+        };
         addDocEventListeners();
     }
 };
@@ -211,11 +231,11 @@ const fillUserData = async () => {
     let status;
     const userTypeStorage = localStorage.getItem('user_type');
     if (userTypeStorage === 'adm') {
-        status = 'Admin:';
+        status = '🧑‍💻 adm:';
     } else if (userTypeStorage === 'doc') {
-        status = 'Doctor:';
+        status = '👨‍⚕️ doc:';
     } else if (userTypeStorage === 'pot') {
-        status = 'Patient:'
+        status = '🧍‍♂️ pat:'
     }
 
     const userData = await getUserInfo(userIdStorage, userTypeStorage);
@@ -300,8 +320,8 @@ const addEventListenersPatient = async () => {
 
 const newAlarmPatient = async () => {
     createMod(5);
-    makeModHeader('X Ilmoita oireista / hätätilanne');
-    const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', 'X Ilmoittaa lääkärille', createPatientAlarm);
+    makeModHeader('🚨 Ilmoita oireista / hätätilanne');
+    const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', '⚠️ Ilmoittaa lääkärille', createPatientAlarm);
     const diaBody = await selectBlock('dia-main-block');
     diaBody.appendChild(ilmoitusButton);
 };
@@ -373,7 +393,7 @@ const savePatientAlarm = async (oireet, userText) => {
 
 const showPatSuositukset = async () => {
     createMod(4);
-    makeModHeader('X Lääkärin suositukset');
+    makeModHeader('🩺 Lääkärin suositukset');
 
     const patRecomendations = await getPatReccomendations(localStorage.getItem('user_id'));
     console.log(patRecomendations);
@@ -446,7 +466,7 @@ const addAdmEventListeners = async () => {
     deleteButtons.forEach((button) => {
         button.addEventListener('click', async () => {
             const userBlock = button.closest('.adm-user-block');
-            const userId = userBlock.querySelector('#delete-pat-id')?.textContent?.trim();
+            const userId = userBlock.querySelector('#patient-block-header-id-value')?.textContent?.trim();
 
             if (!userId) {
                 console.error('User ID not found');
@@ -456,7 +476,7 @@ const addAdmEventListeners = async () => {
             const response = await deleteUserById(userId);
             if (response) {
                 userBlock.remove();
-                await showMessageModal('user deleted', 'onnistui');
+                await showMessageModal('⚠️ user deleted', '❌ Delete user');
             }
 
             // Удаляем блок из DOM после успешного удаления
@@ -560,7 +580,7 @@ const getPatSuosituksia = async () => {
 
     console.log(lastRecom, patMainData);
 
-    const saveRecommBut = await createButton('mod11-save-recom-but', 'dia-control-button', 'Talenna muutokset', saveNewRecom);
+    const saveRecommBut = await createButton('mod11-save-recom-but', 'dia-control-button', '💾 Talenna muutokset', saveNewRecom);
     diaBody.appendChild(saveRecommBut);
     const blocks = {
         last: await selectBlock('mod11-last-suositus'),
@@ -568,7 +588,11 @@ const getPatSuosituksia = async () => {
         patSurname: await selectBlock('but-header-part-surname')
     };
 
-    blocks.last.textContent = lastRecom.rec_text;
+    if (lastRecom) {
+        blocks.last.textContent = lastRecom.rec_text;
+    } else {
+        blocks.last.textContent = 'No availible data';
+    }
     blocks.patName.textContent = patMainData.name;
     blocks.patSurname.textContent = patMainData.surname;
 };
@@ -585,7 +609,7 @@ const deleteUserById = async (userId) => {
 
         const response = await fetchData(url, options);
 
-        if (!response.ok) {
+        if (!response || response.error) {
             console.error(`Ошибка при удалении пользователя ${userId}`);
             return false;
         } else {
@@ -632,7 +656,7 @@ const validateUserFields = (user) => {
 
 const patientDeleter = async () => {
     createMod(17);
-    const deleteButton = await createButton('new-save-button', 'dia-control-button', 'delete', deletePatient);
+    const deleteButton = await createButton('new-save-button', 'dia-control-button', '❌ delete', deletePatient);
     console.log(deleteButton);
     diaBody.appendChild(deleteButton);
 };
@@ -674,14 +698,14 @@ const checkDocPatient = async (patientID, docID) => {
 const admFindUser = async () => {
     createMod(18);
     const modBody = await selectBlock('dia-body');
-    const findButton = await createButton('search-user-but', 'dia-control-button', 'Find', searchAdmUser);
+    const findButton = await createButton('search-user-but', 'dia-control-button', '🔍 Find', searchAdmUser);
     modBody.appendChild(findButton);
 };
 
 const searchAdmUser = async () => {
     const userID = await getVal('search-user-adm');
     if (!userID || userID.error) {
-        showErrorModal(admFindUser, 'wrong or empty ID', '👤 Find user');
+        showErrorModal(admFindUser, '❗ wrong or empty ID', '🔍 Find user');
     } else {
         const url = `http://localhost:3000/api/users/admin/${userID}`;
         const options = {
@@ -694,7 +718,7 @@ const searchAdmUser = async () => {
         const response = await fetchData(url, options);
 
         if (!response || response.error) {
-            showErrorModal(admFindUser, 'wrong ID, try again', '👤 Find user');
+            showErrorModal(admFindUser, '❗ wrong ID, try again', '🔍 Find user');
         } else {
             await admUserFound(response.userData);
             return true;
@@ -730,7 +754,7 @@ const admUserFound = async (userData) => {
     blocks.dor.textContent = formatDate(dateofregistration);
     blocks.ht.textContent = henkilotunnus;
 
-    const backButton = await createButton('mod19-back-button', 'dia-control-button', 'Find another', admFindUser);
+    const backButton = await createButton('mod19-back-button', 'dia-control-button', '🔍 Find another', admFindUser);
     blocks.body.appendChild(backButton);
 };
 
@@ -739,7 +763,7 @@ const createNewPatient = async () => {
 
     const luoUusi = document.createElement('div');
     luoUusi.className = 'mod12-new-pat';
-    luoUusi.innerHTML = `<button id="luo-uusi-pot">X Luo profiili</button>`;
+    luoUusi.innerHTML = `<button id="luo-uusi-pot">💾 Luo profiili</button>`;
     diaBody.appendChild(luoUusi);
 
     const newButton = document.querySelector('#luo-uusi-pot');
@@ -893,10 +917,7 @@ const getPatMittauskaavio = async (patID) => {
     const patientInfo = await getUserInfo(patID, 'pot');
     const patientMetrics = await getMetric(patID);
 
-    if (!patientMetrics || patientMetrics.length === 0) {
-        document.querySelector('#dia-main-block').textContent = 'No Metrics Available';
-        return;
-    }
+    
 
     const diaBody = document.querySelector('#dia-body');
 
@@ -905,12 +926,13 @@ const getPatMittauskaavio = async (patID) => {
     buttons.className = 'mod10-buttons';
     buttons.innerHTML = `
         <div class="mod10-button">
-            <button class="mod10-nav-button" id="mod10-button-uusi">Uusi</button>
+            <button class="mod10-nav-button" id="mod10-button-uusi">◀️ Uusi</button>
         </div>
         <div class="mod10-button">
-            <button class="mod10-nav-button" id="mod10-button-vanha">Vanha</button>
+            <button class="mod10-nav-button" id="mod10-button-vanha">Vanha ▶️</button>
         </div>
     `;
+
     diaBody.appendChild(buttons);
 
     const blocks = {
@@ -929,6 +951,15 @@ const getPatMittauskaavio = async (patID) => {
 
     blocks.pot_name.textContent = patientInfo.name;
     blocks.pot_surname.textContent = patientInfo.surname;
+
+    if (!patientMetrics || patientMetrics.length === 0) {
+        const modHead = await selectBlock('dia-header-value');
+        showMessageModal('No metrics availible', modHead.innerHTML);
+        return;
+    }
+
+    
+    
 
     attachMetricsNavigation(blocks, patientMetrics);
 };
@@ -1027,42 +1058,48 @@ const getPatAIreports = async (patID) => {
 
     console.log('PATRESS:', patientAIres);
 
-    if (patientAIres.length > 0) {
-        const buttons = document.createElement('div');
-        buttons.className = 'mod8-buttons';
-        buttons.innerHTML = `
-            <div class="mod8-button">
-                <button class="mod8-ai-button" id="mod8-button-uusi">Uusi</button>
-            </div>
-            <div class="mod8-button">
-                <button class="mod8-ai-button" id="mod8-button-vanha">Vanha</button>
-            </div>`;
-        diaBody.appendChild(buttons);
+    
+    const buttons = document.createElement('div');
+    buttons.className = 'mod8-buttons';
+    buttons.innerHTML = `
+        <div class="mod8-button">
+            <button class="mod8-ai-button" id="mod8-button-uusi">◀️ Uusi</button>
+        </div>
+        <div class="mod8-button">
+            <button class="mod8-ai-button" id="mod8-button-vanha">Vanha ▶️</button>
+        </div>`;
+    diaBody.appendChild(buttons);
 
-        const blocks = {
-            pot_name: document.querySelector('#but-header-part-name'),
-            pot_surname: document.querySelector('#but-header-part-surname'),
-            risk_value: document.querySelector('#mod8-risk-value'),
-            pat_res_value: document.querySelector('#mod8-pat-value'),
-            doc_res_value: document.querySelector('#mod8-doc-value'),
-            new_button: document.querySelector('#mod8-button-uusi'),
-            old_button: document.querySelector('#mod8-button-vanha'),
-        };
+    const blocks = {
+        pot_name: document.querySelector('#but-header-part-name'),
+        pot_surname: document.querySelector('#but-header-part-surname'),
+        rep_date: await selectBlock('mod8-date-value'),
+        risk_value: document.querySelector('#mod8-risk-value'),
+        pat_res_value: document.querySelector('#mod8-pat-value'),
+        doc_res_value: document.querySelector('#mod8-doc-value'),
+        new_button: document.querySelector('#mod8-button-uusi'),
+        old_button: document.querySelector('#mod8-button-vanha'),
+    };
 
-        blocks.pot_name.textContent = patientInfo.name;
-        blocks.pot_surname.textContent = patientInfo.surname;
+    blocks.pot_name.textContent = patientInfo.name;
+    blocks.pot_surname.textContent = patientInfo.surname;
 
-        attachReportNavigation(blocks, patientAIres);
-
-    } else {
-        modBody.textContent = 'No Data For Read';
+    if (patientAIres.length === 0) {
+        const modHead = await selectBlock('dia-header-value');
+        showMessageModal('No data for read', modHead.innerHTML);
+        return;
     }
+
+    attachReportNavigation(blocks, patientAIres);
+
+    
 };
 
 const renderAIreport = (blocks, report) => {
     blocks.risk_value.textContent = report.result_status;
     blocks.pat_res_value.textContent = report.result_pat_text;
     blocks.doc_res_value.textContent = report.result_doc_text;
+    blocks.rep_date.textContent = formatDate(report.result_date);
 };
 
 const attachReportNavigation = (blocks, reports) => {

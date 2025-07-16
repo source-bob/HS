@@ -10,22 +10,42 @@ const aiRouter = express.Router();
 aiRouter.route('/')
   .post(
     authenticateToken,
+
     body('user_id')
       .isInt()
       .withMessage('user_id must be an integer'),
+
     body('metrics')
-      .isArray({ min: 300, max: 300 }).withMessage('metrics must be an array of 300 values')
-      .custom((arr) => arr.every(v => typeof v === 'number' && v > 0))
-      .withMessage('metrics array must contain only positive numbers'),
+      .custom(metrics => {
+        const requiredNumericFields = ['sdnn', 'rmssd', 'pnn50', 'lf_hf', 'rr_mean'];
+
+        if (!metrics || typeof metrics !== 'object') {
+          throw new Error('metrics must be an object');
+        }
+
+        for (const key of requiredNumericFields) {
+          const value = metrics[key];
+          if (typeof value !== 'number' || value <= 0) {
+            throw new Error(`metrics.${key} must be a positive number`);
+          }
+        }
+
+        return true;
+      }),
+
+
     body('user_age')
       .isInt({ min: 1, max: 500 })
       .withMessage('user_age must be a valid age'),
+
     body('hr')
       .isInt({ min: 0, max: 250 })
       .withMessage('hr must be a realistic heart rate'),
+
     body('date')
       .isNumeric()
       .withMessage('date must be a timestamp'),
+
     validationErrorHandler,
     analyze
   );
@@ -33,7 +53,11 @@ aiRouter.route('/')
 aiRouter.route('/:id')
   .get(
     authenticateToken,
-    param('id').isInt().withMessage('id must be an integer'),
+
+    param('id')
+      .isInt()
+      .withMessage('id must be an integer'),
+
     validationErrorHandler,
     getAiRes
   )

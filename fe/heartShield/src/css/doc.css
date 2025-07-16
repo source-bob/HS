@@ -50,7 +50,7 @@
 
 .patient-block-header-status {
     width: 20%;
-    min-width: 60px;
+    min-width: 85px;
     height: 100%;
     background-color: grey;
 }
@@ -88,6 +88,7 @@
     height: 20%;
     background-color: blue;
     display: flex;
+    font-size: 90%;
 }
 
 .patient-block-hrv-header {

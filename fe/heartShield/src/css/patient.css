@@ -20,15 +20,16 @@
     border: 1px solid black;
     box-sizing: border-box;
     display: flex;
-    align-items: center;
+    font-size: 90%;
 }
 
 .patient-info-main-header {
     background-color: blueviolet;
+    min-width: 95px;
 }
 
 .patient-info-main-value {
-    min-width: 65%;
+    min-width: 125px;
     max-width: 98%;
     margin-left: 2%;
     background-color: chocolate;
@@ -58,11 +59,13 @@
 .patient-buttons-top {
     width: 100%;
     height: 85%;
+    max-height: 50px;
 }
 
 .patient-buttons-bottom {
     width: 31.3%;
     height: 85%;
+    max-height: 50px;
 }
 
 .patient-ai {
@@ -111,6 +114,10 @@
     background-color: #880015;
 }
 
+#patient-alarm-button:hover {
+    background-color: #ab011a;
+}
+
 .hrv-kaavio-row {
     width: 100%;
     background-color: green;
@@ -151,6 +158,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+#dia-mittari-header-left {
+    width: 60%
 }
 
 #dia-mittari-status-block {

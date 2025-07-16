@@ -46,7 +46,7 @@ const createMod = async (number) => {
     const userLvl = userType();
 
     if (number === 1) {
-        modHeader.textContent = 'HRV-Kaavio';
+        makeModHeader('🧠 HRV-Kaavio');
         modBody.innerHTML = `
         <div class="hrv-kaavio-row">
             <div class="hrv-kaavio-row-header">RMSSD (ms):</div>
@@ -63,6 +63,13 @@ const createMod = async (number) => {
             <div class="hrv-kaavio-row-value" id="hrv-kaavio-sdnn-value">-</div>
         </div>
         <div class="hrv-kaavio-row">
+            <div class="hrv-kaavio-row-header">PNN50:</div>
+            <div class="hrv-kaavio-row-graph">
+                <div class="kaavio-graph" id="hrv-kaavio-graph-pnn50"></div>
+            </div>
+            <div class="hrv-kaavio-row-value" id="hrv-kaavio-pnn50-value">-</div>
+        </div>
+        <div class="hrv-kaavio-row">
             <div class="hrv-kaavio-row-header">LF/HF-suhde:</div>
             <div class="hrv-kaavio-row-graph">
                 <div class="kaavio-graph" id="hrv-kaavio-graph-lfhf"></div>
@@ -73,6 +80,7 @@ const createMod = async (number) => {
 
         const rmssdValue = document.querySelector('#hrv-kaavio-rmssd-value');
         const sdnnValue = document.querySelector('#hrv-kaavio-sdnn-value');
+        const pnn50Value = document.querySelector('#hrv-kaavio-pnn50-value');
         const lfhfValue = document.querySelector('#hrv-kaavio-lfhf-value');
 
         // 📢 Подписка на изменения HRVState
@@ -83,10 +91,10 @@ const createMod = async (number) => {
                 sdnn: null,
                 rmssd: null,
                 pnn50: null,
-                lfhf: null,
+                lf_hf: null,
             };
 
-            const { sdnn, rmssd, pnn50, lfhf } = state.rrMetrics !== null? state.rrMetrics : kanssi;  // Получаем актуальные данные из состояния
+            const { sdnn, rmssd, pnn50, lf_hf } = state.rrMetrics !== null? state.rrMetrics : kanssi;  // Получаем актуальные данные из состояния
 
             // Обновляем значения в UI
             if (rmssd !== null) {
@@ -99,26 +107,31 @@ const createMod = async (number) => {
                 sdnnValue.textContent = `${sdnn}`;
                 updateGraph('hrv-kaavio-graph-sdnn', sdnn, 0, 150); // аналогично
             }
+
+            if (pnn50 !== null) {
+                pnn50Value.textContent = `${pnn50}`;
+                updateGraph('hrv-kaavio-graph-pnn50', pnn50, 0, 100); // аналогично
+            }
         
-            if (lfhf !== null) {
-                lfhfValue.textContent = `${lfhf}`;
-                updateGraph('hrv-kaavio-graph-lfhf', lfhf, 0, 5); // допустим LF/HF от 0 до 5
+            if (lf_hf !== null) {
+                lfhfValue.textContent = `${lf_hf}`;
+                updateGraph('hrv-kaavio-graph-lfhf', lf_hf, 0, 5); // допустим LF/HF от 0 до 5
             }
         });
     } else if (number === 2) {
         modBody.textContent = '';
     } else if (number === 3) {
-        modHeader.textContent = 'Mittari';
+        makeModHeader('🔌 Mittari');
         modBody.innerHTML = `
         <div id="dia-mittari-header">
             <div id="dia-mittari-header-left">
                 <div id="dia-mittari-status-block">
                     <div>Tilanne:</div>
-                    <div id="dia-mittari-status">Disconnected</div>
+                    <div id="dia-mittari-status">🔴 Disconnected</div>
                 </div>
             </div>
             <div id="dia-mittari-header-right">
-                <button id="dia-find-mittari">Etsi</button>
+                <button id="dia-find-mittari">🔍 Etsi</button>
             </div>
         </div>
         `;
@@ -130,7 +143,7 @@ const createMod = async (number) => {
     } else if (number === 5) {
         modBody.innerHTML = `
         <div class="mod5" id="mod5">
-            <div class="sign-block">X</div>
+            <div class="sign-block">❗</div>
             <div class="mod5-body">
                 <div class="mod5-body-header">Valitse oire(ta)</div>
                 <div class="mod5-body-body">
@@ -190,14 +203,16 @@ const createMod = async (number) => {
         modBody.style.flexDirection = 'column';
     } else if (number === 7) {
         diaBody.style.backgroundColor = '#880015';
-        modHeader.textContent = '🔴 HÄTÄTILANNE - POTILAS KRIITTISESSÄ TILASSA';
+        modHeader.innerHTML = `
+        <div class="sign-block">🔴</div>
+        <div class="mod7-dia-header">HÄTÄTILANNE - POTILAS KRIITTISESSÄ TILASSA</div>`;
         modHeader.style.color = 'white';
 
         modBody.innerHTML = `
         <div id="alarm-id"></div>
         <div id="alarm-dia-main-info">
             <div class="alarm-dia-main-header">Potilas:</div>
-            <div class="alarm-dia-main-name"></div>
+            <div class="alarm-dia-main-name" id="alarm-dia-main-name"></div>
         </div>
         <div id="alarm-dia-add-info">
             <div class="alarm-dia-add-part">
@@ -224,7 +239,7 @@ const createMod = async (number) => {
             </div>
             <div class="alarm-dia-add-part">
                 <div class="sign-block">⏱️</div>
-                <div>Potilas ei vastanut ilmoitukseen.</div>
+                <div id="mod7-pot-answer"></div>
             </div>
         </div>
         `;
@@ -244,17 +259,22 @@ const createMod = async (number) => {
         </div>`;
         modBody.innerHTML = `
         <div class="mod8-row">
-            <div class="sign-block">X</div>
+            <div class="sign-block">📅</div>
+            <div class="header-block">Date:</div>
+            <div class="data-block" id="mod8-date-value"></div>
+        </div>
+        <div class="mod8-row">
+            <div class="sign-block">⚠️</div>
             <div class="header-block">Risk:</div>
             <div class="data-block" id="mod8-risk-value"></div>
         </div>
         <div class="mod8-row">
-            <div class="sign-block">X</div>
+            <div class="sign-block">📄</div>
             <div class="header-block">For pat:</div>
             <div class="data-block" id="mod8-pat-value"></div>
         </div>
         <div class="mod8-row">
-            <div class="sign-block">X</div>
+            <div class="sign-block">📋</div>
             <div class="header-block">For doc:</div>
             <div class="data-block" id="mod8-doc-value"></div>
         </div>`;
@@ -294,7 +314,7 @@ const createMod = async (number) => {
         </div>`;
     } else if (number === 10) {
         modHeader.innerHTML = `
-        <div class="sign-block">📊</div>
+        <div class="sign-block">📈</div>
         <div class="doc-but-dia-header">
             <div class="doc-but-header-part">Mittauskaavio — HRV-trendi</div>
             <div class="doc-but-header-part">
@@ -333,9 +353,9 @@ const createMod = async (number) => {
         </div>`;
     } else if (number === 11) {
         modHeader.innerHTML = `
-        <div class="sign-block">📊</div>
+        <div class="sign-block">✍️</div>
         <div class="doc-but-dia-header">
-            <div class="doc-but-header-part">X Muokkaa suosituksia</div>
+            <div class="doc-but-header-part">Muokkaa suosituksia</div>
             <div class="doc-but-header-part">
                 <div class="but-header-part-part">Potilas:</div>
                 <div class="but-header-part-part" id="but-header-part-name"></div>
@@ -344,14 +364,14 @@ const createMod = async (number) => {
         </div>`;
         modBody.innerHTML = `
         <div class="mod11-suositus-block">
-            <div class="sign-block">X</div>
+            <div class="sign-block">📄</div>
             <div class="mod11-data-part">
                 <div class="mod11-row-header">Nykyinen hoitosuositus:</div>
                 <div class="mod11-value-row" id="mod11-last-suositus">Suositus</div>
             </div>
         </div>
         <div class="mod11-suositus-block">
-            <div class="sign-block">X</div>
+            <div class="sign-block">📝</div>
             <div class="mod11-data-part">
                 <div class="mod11-row-header">Uusi suositus:</div>
                 <div class="mod11-value-row">
@@ -459,7 +479,7 @@ const createMod = async (number) => {
         console.log('MOD 16');
     } else if (number === 17) {
         console.log('MOD 17');
-        makeModHeader('👤 Delete patient');
+        makeModHeader('❌ Delete patient');
         modBody.innerHTML = `
         <div class="mod12-row">
             <div class="sign-block">🆔</div>
@@ -469,16 +489,16 @@ const createMod = async (number) => {
         </div>`;
     } else if (number === 18) {
         console.log('mod18');
-        makeModHeader('👤 Find user');
+        makeModHeader('🔍 Find user');
         modBody.innerHTML = `
         <div class="mod12-row">
-            <div class="sign-block">X</div>
+            <div class="sign-block">👤</div>
             <div class="mod12-row-header">User ID:</div>
             <input type="text" class="mod12-row-input" id="search-user-adm" />
         </div>`;
     } else if (number === 19) {
         console.log('MOD19');
-        makeModHeader('👤 Find user');
+        makeModHeader('🔍 Find user');
         modBody.innerHTML = `
         <div class="mod19-body-header">
             <div class="mod19-id-block">
@@ -492,32 +512,32 @@ const createMod = async (number) => {
         </div>
         <div class="mod19-body-body">
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">👤</div>
                 <div class="mod12-row-header">name:</div>
                 <div class="mod12-row-value" id="mod19-name-value"></div>
             </div>
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">📧</div>
                 <div class="mod12-row-header">email:</div>
                 <div class="mod12-row-value" id="mod19-email-value"></div>
             </div>
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">📞</div>
                 <div class="mod12-row-header">phone:</div>
                 <div class="mod12-row-value" id="mod19-phone-value"></div>
             </div>
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">🎂</div>
                 <div class="mod12-row-header">date of birth:</div>
                 <div class="mod12-row-value" id="mod19-dob-value"></div>
             </div>
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">🗓️</div>
                 <div class="mod12-row-header">date of reg:</div>
                 <div class="mod12-row-value" id="mod19-dor-value"></div>
             </div>
             <div class="mod12-row">
-                <div class="sign-block">X</div>
+                <div class="sign-block">📋</div>
                 <div class="mod12-row-header">henkilotunnus:</div>
                 <div class="mod12-row-value" id="mod19-ht-value"></div>
             </div>

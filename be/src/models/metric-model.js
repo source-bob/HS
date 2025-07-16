@@ -1,10 +1,10 @@
 import promisePool from "../utils/database.js";
 
 const saveMetricToDatabase = async (userId, userData) => {
-  const { sdnn, rmssd, pnn50, lfhf, rr_mean, hr, hrv } = userData;
+  const { sdnn, rmssd, pnn50, lf_hf, rr_mean, hr, hrv } = userData;
   const sql = `INSERT INTO metrics (pat_id, lf_hf, sdnn, rmssd, pnn50, hr, rr_mean, hrv_status)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-  const params = [userId , lfhf, sdnn, rmssd, pnn50, hr, rr_mean, hrv];
+  const params = [userId , lf_hf, sdnn, rmssd, pnn50, hr, rr_mean, hrv];
 
   console.log('USER DATA FOR SAVING:', userId, userData)
 
@@ -30,5 +30,20 @@ const getLastMeasures = async (patId, amount) => {
     console.error('error:', e);
   }
 };
+
+const testFunc = async () => {
+  const patMes = await getLastMeasures(6, 1);
+  const measures = patMes[0];
+  const check = Object.values(measures);
+  const keyCheck = Object.keys(measures);
+  for (let value of check) {
+    console.log(typeof(value));
+  }
+  console.log(keyCheck);
+};
+
+testFunc();
+
+
 
 export { saveMetricToDatabase, getLastMeasures };

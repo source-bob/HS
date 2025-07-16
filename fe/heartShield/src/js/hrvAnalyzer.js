@@ -6,7 +6,7 @@ import { selectBlock } from './mech.js';
 let lastAIRequestTimestamp = 0;
 let lastSaveTimestamp = 0;
 const SAVE_INTERVAL_MS = 60 * 1000; // 1 час
-const AI_REQUEST_COOLDOWN_MS = 30 * 60 * 1000; // 10 минут
+const AI_REQUEST_COOLDOWN_MS = 60 * 60 * 1000; // 10 минут
 
 async function monitorHRVStatus() {
     setInterval(async () => {
@@ -23,23 +23,22 @@ async function monitorHRVStatus() {
         const userId = parseInt(localStorage.getItem('user_id'));
         const userAge = localStorage.getItem('pat_age');
 
-        if (currentStatus === "Normaali HRV") {
-            if (now - lastSaveTimestamp >= SAVE_INTERVAL_MS) {
-                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate, currentStatus);
-                lastSaveTimestamp = now;
-            }
-        } else if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS && currentStatus !== 'Normaali HRV') {
+        if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS && currentStatus !== 'Normaali') {
             console.log('SENDING METRICS TO AI, STEP 1');
-            
-            await sendMetricsToAI(currentMetrics, userId, userAge);
             lastAIRequestTimestamp = now;
+            await sendMetricsToAI(currentMetrics, userId, userAge);
+            
         } else {
             console.log('AI Cooldown');
         }
 
         if (now - lastSaveTimestamp >= SAVE_INTERVAL_MS) {
-                await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate, currentStatus);
-            }
+            lastSaveTimestamp = now;
+            await saveMetricsToDatabase(userId, currentMetrics, currentHeartRate, currentStatus);
+            
+        }
+
+        
     }, 5000); // проверяем каждые 5 секунд
 };
 
@@ -47,7 +46,7 @@ async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
     // Здесь заглушка вместо реальной базы
     console.log('💾 Сохраняем метрики в базу данных:', metrics);
     metrics.hr = hr;
-    metrics.hrv = hrv.split(' ( ')[0];
+    metrics.hrv = hrv;
 
     const url = `http://localhost:3000/api/metrics/${userId}/`;
     const options = {

@@ -3,6 +3,7 @@ import { createMod } from "./mods";
 import { getUserInfo } from "./users";
 import { getMetric } from "./hrvAnalyzer";
 import { getFullAiResponse } from "./users";
+import { selectBlock } from "./mech";
 
 function alarmChecker(doc) {
     setInterval(async () => {
@@ -44,13 +45,14 @@ async function fillDocNotification(params) {
     console.log('PATIENT AI RESPONSE:', patAiRes);
 
     const blocks = {
-        name: document.querySelector('.alarm-dia-main-name'),
-        rmssd: document.querySelector('#alarm-dia-metric-rmssd'),
-        sdnn: document.querySelector('#alarm-dia-metric-sdnn'),
-        pat_ai: document.querySelector('#alarm-dia-pat-ai'),
-        doc_ai: document.querySelector('#alarm-dia-doc-ai'),
-        alarm_id: document.querySelector('#alarm-id'),
-        check_but: document.querySelector('#close-dialog-button'),
+        name: await selectBlock('alarm-dia-main-name'),
+        rmssd: await selectBlock('alarm-dia-metric-rmssd'),
+        sdnn: await selectBlock('alarm-dia-metric-sdnn'),
+        pat_ai: await selectBlock('alarm-dia-pat-ai'),
+        doc_ai: await selectBlock('alarm-dia-doc-ai'),
+        alarm_id: await selectBlock('alarm-id'),
+        check_but: await selectBlock('close-dialog-button'),
+        pot_check: await selectBlock('mod7-pot-answer')
     };
 
     async function changeDocCheck() {
@@ -64,6 +66,11 @@ async function fillDocNotification(params) {
     blocks.pat_ai.textContent = patAiRes[0].result_pat_text;
     blocks.doc_ai.textContent = patAiRes[0].result_doc_text;
     blocks.alarm_id.textContent = params.res_id;
+    if (params.pat_check === 1) {
+        blocks.pot_check.textContent = 'Potilas answered ilmoitukseen.';
+    } else if (params.pat_check === 0) {
+        blocks.pot_check.textContent = 'Potilas ei vastanut ilmoitukseen.'
+    }
 
     blocks.check_but.addEventListener('click', changeDocCheck);
 };

@@ -8,13 +8,13 @@ const loginUser = async (event) => {
     const loginForm = document.querySelector('.login-form');
 
     // Haetaan formista arvot
-    const email = loginForm.querySelector('#login-email').value.trim();
-    const password = loginForm.querySelector('#login-password').value.trim();
+    const user_email = loginForm.querySelector('#login-email').value.trim();
+    const user_password = loginForm.querySelector('#login-password').value.trim();
 
     // Luodaan body lähetystä varten taustapalvelun vaatimaan muotoon
     const bodyData = {
-        user_email: email,
-        user_password: password,
+        email: user_email,
+        password: user_password,
     };
 
     // Endpoint
@@ -57,19 +57,20 @@ const loginUser = async (event) => {
     console.log(response);
     const userType = localStorage.getItem('user_type');
     if (userType === 'adm') {
-        window.location.href = 'src/pages/admin.html';
+        window.location.href = 'admin.html';
     } else if (userType === 'pot') {
-        window.location.href = 'src/pages/patient.html';
+        window.location.href = 'patient.html';
     } else if (userType === 'doc') {
-        window.location.href = 'src/pages/doc.html';
+        window.location.href = 'doc.html';
     }
     loginForm.reset(); // tyhjennetään formi
     
 };
 
 const logout = async () => {
-    window.location.href = 'login.html';
     localStorage.clear();
+    window.location.href = 'index.html';
+    
 };
 
 

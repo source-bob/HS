@@ -28,6 +28,9 @@ const makeResearch = async (userData) => {
       ],
     });
 
+    console.log('RESULT CHOICES:', result.choices);
+    console.log('RESULT CHOICES MESSAGE:', result.choices[0].message);
+
     const resultFin = extractFinalJSON(result.choices[0].message);
 
     console.log('RESULT FIN', resultFin);
@@ -109,7 +112,7 @@ function createPrompt(metrics, age, hr, lastMetrics, date) {
     - SDNN: ${metrics.sdnn} ms
     - RMSSD: ${metrics.rmssd} ms
     - pNN50: ${metrics.pnn50}%
-    - LF/HF suhde: ${metrics.lfhf}
+    - LF/HF suhde: ${metrics.lf_hf}
     - mean RR: ${metrics.rr_mean}
 
     Previous hourly metrics:
@@ -131,6 +134,8 @@ function createPrompt(metrics, age, hr, lastMetrics, date) {
 
 function extractFinalJSON(aiResponse) {
   const match = aiResponse.content.match(/{[\s\S]*}$/);
+  console.log('MATCH:', match);
+  console.log('EXTRACTFINALJSON:', aiResponse);
   if (match) {
     try {
       return JSON.parse(match[0]);
