@@ -10,6 +10,9 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     --main-color: red;
+    --grey: #3D3D3D;
+    --grey2: #7F7F7F;
+    --red: #880015;
 }
 
 @font-face {
@@ -22,6 +25,17 @@
 body {
     margin: auto;
     padding-top: 5%;
+}
+
+#window-shadow {
+  position: fixed;            /* Используй fixed, чтобы оставался на месте при скролле */
+  top: 0;
+  left: 0;
+  width: 100%;               /* 100% ширины окна */
+  height: 100%;              /* 100% высоты окна */
+  background-color: rgba(0, 0, 0, 0.6); /* полупрозрачный чёрный (или var(--grey), если ты хочешь серый) */
+  z-index: 1000;              /* Поверх обычного контента, ниже модального окна */
+  display: none;              /* скрыт по умолчанию */
 }
 
 .main-block {
@@ -39,7 +53,6 @@ body {
     border: 5px solid black;
     margin: auto;
     box-sizing: border-box;
-    background-color: grey;
     display: flex;
     flex-direction: column;
     padding: 2%;
@@ -49,7 +62,6 @@ body {
 .page-header {
     width: 100%;
     height: 10%;
-    background-color: aqua;
     color: black;
     display: flex;
 }
@@ -58,7 +70,6 @@ body {
     width: 10%;
     height: 100%;
     min-width: 65px;
-    background-color: brown;
 }
 
 #mini-logo {
@@ -70,15 +81,15 @@ body {
     width: 77%;
     height: 80%;
     margin-top: 1%;
-    background-color: blueviolet;
     vertical-align: middle;
+    padding-top: 2%;
+    box-sizing: border-box;
     font-size: 120%;
 }
 
 .header-logout {
     width: 15%;
     height: 100%;
-    background-color: chocolate;
 }
 
 #logout {
@@ -93,19 +104,18 @@ body {
 .main-info {
     width: 100%;
     height: 7%;
-    background-color: blue;
     display: flex;
     flex-direction: row;
-    padding-left: 2%;
     box-sizing: border-box;
     align-items: center;
 }
 
 .main-info-block {
-    width: 49%;
+    width: 50%;
     height: 70%;
-    background-color: antiquewhite;
-    border: 1px solid black;
+    background-color: var(--grey);
+    border: 1px solid var(--grey);
+    border-radius: 2%;
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -115,33 +125,29 @@ body {
 #main-info-status-value {
     width: 25%;
     text-align: right;
-    background-color: brown;
     min-width: 70px;
 }
 
 #main-info-name-value {
     width: 73%;
-    background-color: blueviolet;
     margin-left: 2%;
 }
 
 #main-info-id-header {
     width: 80%;
     text-align: right;
-    background-color: grey;
 }
 
 #main-info-id-value {
     width: 18%;
     margin-left: 2%;
-    background-color: darkgrey;
 }
 
 button {
     background-color: black;
     color: white;
-    border-radius: 2%;
-    border: 2px solid black;
+    border-radius: 3%;
+    border: 2px solid white;
     font-family: 'Lexend';
     src: url('../fonts/Lexend/Lexend-VariableFont_wght.ttf') format('truetype');
     font-weight: 100 900; /* укажи диапазон весов */
@@ -182,7 +188,6 @@ button:disabled {
     display: flex;
     justify-content: space-between;
     box-sizing: border-box;
-    background-color: pink;
     margin: 2.5%;
     align-items: center;
 }
@@ -193,12 +198,12 @@ button:disabled {
 }
 
 #dia-main-block {
-    background-color: red;
     width: 95%;
     border: 2px solid black;
     margin: 2.5%;
     padding: 2.5%;
     box-sizing: border-box;
+    font-size: 100%;
 }
 
 #dia-header-value {
@@ -207,7 +212,6 @@ button:disabled {
 
 .sign-block {
     height: 100%;
-    background-color: aquamarine;
     margin-right: 2%;
 }
 

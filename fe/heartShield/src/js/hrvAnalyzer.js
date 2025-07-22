@@ -1,12 +1,13 @@
 import HRVState from './hrvState.js';
 import { fetchData } from './fetch.js';
 import { createMod } from './mods.js';
-import { selectBlock } from './mech.js';
+import { createButton, selectBlock, createShadow, showMessageModal } from './mech.js';
+import { callEmergency } from './alarm.js';
 
 let lastAIRequestTimestamp = 0;
 let lastSaveTimestamp = 0;
-const SAVE_INTERVAL_MS = 60 * 1000; // 1 час
-const AI_REQUEST_COOLDOWN_MS = 60 * 60 * 1000; // 10 минут
+const SAVE_INTERVAL_MS = 60 * 1000; // 1 min
+const AI_REQUEST_COOLDOWN_MS = 10 * 60 * 1000; // 10 min
 
 async function monitorHRVStatus() {
     setInterval(async () => {
@@ -104,42 +105,59 @@ async function handleAiResponse(data, userId) {
         if (mainContent.status === 'critical') {
             await alarm(mainContent, userId);
         } else if (mainContent.status === 'warning') {
-            await warning(mainContent, userId);
+            await ahtung(mainContent.inserted_id, userId, true);
         } else {}
     } catch (e) {
         console.error('error:', e);
     }
 };
 
-async function warning(data, userID) {
-    const modWindow = await selectBlock('main-dialog');
-    modWindow.close();
-    ahtung(data.inserted_id, userID, true);
-    return true;
+/*const testData = {
+    content: {
+        inserted_id: 1,
+        status: 'critical',
+        patient_instruction: 'Continue monitoring and maintain normal activities. Contact a doctor if you experience chest pain or shortness of breath.',
+        result_doc_text: 'HRV parameters (SDNN, RMSSD, pNN50) are within normal ranges. Balanced LF/HF ratio suggests stable autonomic activity. No immediate signs of acute cardiac risk based on current data.',
+        answered: 'false'
+    }
 };
+
+const alarmTests = async () => {
+    await handleAiResponse(testData, 6);
+    return;
+};
+
+alarmTests();
+*/
 
 async function alarm(data, userId) {
     createMod(6);
+    async function butListener() {
+        clearInterval(timerInterval);
+        ahtung(data.inserted_id, userId, true);
+        await createShadow(2);
+        modWindow.close();
+    };
+
+    const alarmButton = await createButton('alarm-dia-button-pat', 'dia-control-button', '⚠️ Olen kunnossa', butListener);
+    const modBody = await selectBlock('dia-body');
     const modWindow = document.querySelector('#main-dialog');
-    let timeLeft = 60;
-    const button = document.getElementById('alarm-dia-button');
+
+    modBody.appendChild(alarmButton);
+    let timeLeft = 180;
 
     const timerInterval = setInterval(() => {
         timeLeft--;
-        button.textContent = `Olen kunnossa (${timeLeft})`;
+        alarmButton.textContent = `⚠️ Olen kunnossa (${timeLeft})`;
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            modWindow.close();
+            showMessageModal('⚠️ Your doctor will be notified as soon as possible', '🚨 VAROITUS - SYDÄMEN TOIMINTA POIKKEAA NORMISTA', 2);
             ahtung(data.inserted_id, userId, false); // если время истекло и не нажали
+            callEmergency(data, userId);
+            console.log('AHTUNG TEHTY');
         }
     }, 1000);
-
-    button.addEventListener('click', () => {
-        clearInterval(timerInterval);
-        ahtung(data.inserted_id, userId, true);
-        modWindow.close(); // пользователь нажал кнопку — отменяем тревогу
-    });
 
 };
 
@@ -196,4 +214,9 @@ async function getMetric(patID) {
 };
 
 
-export { ahtung, monitorHRVStatus, rebuildAiText, getMetric };
+export {
+    ahtung,
+    monitorHRVStatus,
+    rebuildAiText,
+    getMetric
+};

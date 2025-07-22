@@ -2,7 +2,14 @@ import express from 'express';
 import { body, param } from 'express-validator';
 import { validationErrorHandler } from '../middlewares/error-handler.js';
 import { authenticateToken } from '../middlewares/authentication.js';
-import { saveAlarm, checkAlarm, changeDocCheck } from '../controllers/emergency-controller.js';
+import {
+  getAlarmMsgs,
+  savePatAlarm,
+  saveAlarm,
+  checkAlarm,
+  changeDocCheck,
+  changeDocCheckMsg
+} from '../controllers/emergency-controller.js';
 
 const emergencyRouter = express.Router();
 
@@ -41,6 +48,24 @@ emergencyRouter.route('/:id')
     validationErrorHandler,
     checkAlarm
   )
+  .post(
+    authenticateToken,
+    param('id')
+      .isInt()
+      .withMessage('Invalid ID'),
+    body('symptoms')
+      .trim()
+      .isString()
+      .isLength({min: 4, max: 120})
+      .withMessage('symptoms must be a string'),
+    body('pat_msg')
+      .trim()
+      .isString()
+      .isLength({min: 4, max: 150})
+      .withMessage('pat_msg must be a string'),
+    validationErrorHandler,
+    savePatAlarm
+  )
   .patch(
     authenticateToken,
 
@@ -50,6 +75,26 @@ emergencyRouter.route('/:id')
 
     validationErrorHandler,
     changeDocCheck
+  );
+
+emergencyRouter.route('/msg/:id')
+  .get(
+    authenticateToken,
+    param('id')
+      .isInt()
+      .withMessage('ID must be an integer'),
+    validationErrorHandler,
+    getAlarmMsgs
+  )
+  .patch(
+    authenticateToken,
+
+    param('id')
+      .isInt()
+      .withMessage('Invalid ID'),
+
+    validationErrorHandler,
+    changeDocCheckMsg
   );
 
 export default emergencyRouter;

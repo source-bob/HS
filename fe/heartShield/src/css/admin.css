@@ -1,14 +1,12 @@
 .user-panel {
     width: 100%;
     height: 83%;
-    background-color: brown;
     display: flex;
 }
 
 .left-part {
     width: 50%;
     height: 100%;
-    background-color: yellow;
     display: flex;
     flex-direction: column;
 }
@@ -16,15 +14,15 @@
 .top-part {
     width: 100%;
     height: 70%;
-    background-color: green;
+    background-color: var(--grey);
     padding: 2.5%;
     box-sizing: border-box;
+    font-size: 90%;
 }
 
 .top-part-part {
     width: 100%;
     height: 48.75%;
-    background-color: aqua;
     box-sizing: border-box;
 }
 
@@ -35,42 +33,36 @@
 .top-part-part-header {
     width: 100%;
     height: 16%;
-    background-color: blue;
+    font-size: 100%;
 }
 
 .top-part-part-data {
     width: 100%;
     height: 84%;
-    background-color: violet;
 }
 
 .top-part-data-row {
     width: 95%;
     height: calc(100% / 3);
-    background-color: bisque;
     box-sizing: border-box;
     float: right;
     display: flex;
     align-items: center;
 }
 
-.top-part-row-header {
-    background-color: blueviolet;
-}
-
 .top-part-row-value {
-    background-color: orange;
     margin-left: 2%;
 }
 
 .bot-part {
-    width: 95%;
+    width: 100%;
     height: 30%;
-    background-color: yellowgreen;
+    background-color: var(--grey);
     display: flex;
     flex-direction: column;
-    margin: 2.5%;
+    margin-top: 2.5%;
     box-sizing: border-box;
+    padding: 2.5% 2.5% 0 2.5%;
 }
 
 #bot-part-header {
@@ -78,41 +70,37 @@
 }
 
 .hallinta-button {
-    width: 95%;
+    width: 100%;
     height: 25%;
-    margin: 2.5%;
 }
 
 .right-part {
     width: 50%;
     height: 100%;
-    background-color: pink;
     box-sizing: border-box;
-    padding: 1.25% 0 0 1.25%;
+    padding: 0 0 0 1.25%;
 }
 
 #list-of-users {
-    width: 97.5%;
+    width: 100%;
     height: 100%;
-    border: 3px solid black;
+    border: 4px solid black;
     box-sizing: border-box;
-    background-color: #7F7F7F;
+    background-color: var(--grey2);
     overflow-y: auto;
     overflow-x: hidden;
     border-radius: 1%;
 }
 
 .adm-user-block {
-    width: 90%;
+    width: 95%;
     height: 15%;
-    background-color: #3D3D3D;
+    background-color: var(--grey);
     margin: 2%;
     border-radius: 1%;
     font-size: 70%;
     padding: 2%;
     box-sizing: border-box;
-    color: white;
-    border: 1px solid white;
 }
 
 .adm-user-block button {
@@ -125,7 +113,6 @@
     width: 100%;
     height: 30%;
     display: flex;
-    background-color: blue;
 }
 
 .user-id-block {
@@ -143,7 +130,6 @@
 
 .status-piece {
     width: 30%;
-    background-color: red;
     height: 100%;
     text-align: right;
 }
@@ -151,13 +137,11 @@
 .name-piece {
     height: 100%;
     margin-left: 2%;
-    background-color: aqua;
 }
 
 .second-name-piece {
     margin-left: 2%;
     height: 100%;
-    background-color: green;
 }
 
 .user-id-header {
@@ -215,7 +199,6 @@
 .mod19-body-header {
     width: 100%;
     height: 15%;
-    background-color: aquamarine;
     display: flex;
     justify-content: space-between;
 }
@@ -223,7 +206,6 @@
 .mod19-body-body {
     width: 100%;
     height: 85%;
-    background-color: brown;
 }
 
 .mod19-id-block, .mod19-type-block {

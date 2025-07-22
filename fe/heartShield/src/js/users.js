@@ -1,7 +1,19 @@
 import { fetchData } from "./fetch";
 import { createMod, formatDate } from "./mods";
 import { ahtung, rebuildAiText, getMetric } from "./hrvAnalyzer";
-import { showMessageModal, createButton, selectBlock, getVal, showErrorModal, makeModHeader, userType, userID } from "./mech";
+import { createPatientAlarm } from "./alarm";
+import {
+    showMessageModal,
+    createButton,
+    selectBlock,
+    getVal,
+    showErrorModal,
+    makeModHeader,
+    userType,
+    userID,
+    createEmptyBlocks,
+    fillBlocks
+} from "./mech";
 
 const modBody = document.querySelector('#dia-main-block');
 const diaBody = document.querySelector('#dia-body');
@@ -34,8 +46,6 @@ const getUsers = async () => {
         console.log('tapahtui virhe fetch haussa');
         return
     }
-
-    console.log('users:', users);
     
     if (userType === 'adm') {
         await countAndFillUsers(users);
@@ -255,11 +265,8 @@ const fillPatientData = async () => {
     const userData = await getUserInfo(userIdStorage, 'pot');
     const lastAiResponse = await getLastAiResponse(userIdStorage);
     const aiUserBlock = document.querySelector('#patient-ai-text');
-
-    console.log('AI RES:', lastAiResponse.data.result_pat_text);
     
 
-    console.log(userData);
     const ageValue = await getAge(userData.dateofbirth);
 
     localStorage.setItem('pat_age', ageValue);
@@ -320,75 +327,13 @@ const addEventListenersPatient = async () => {
 
 const newAlarmPatient = async () => {
     createMod(5);
+    console.log('CREATING ALARM');
     makeModHeader('🚨 Ilmoita oireista / hätätilanne');
     const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', '⚠️ Ilmoittaa lääkärille', createPatientAlarm);
-    const diaBody = await selectBlock('dia-main-block');
+    const diaBody = await selectBlock('dia-body');
+    
     diaBody.appendChild(ilmoitusButton);
-};
-
-const createPatientAlarm = async () => {
-  const mod5 = await selectBlock('mod5');
-  const oireet = [];
-  
-  // Найти все div.mod5-oire внутри mod5
-  const oireBlocks = mod5.querySelectorAll('.mod5-oire');
-  oireBlocks.forEach(oireBlock => {
-    const checkbox = oireBlock.querySelector('input[type="checkbox"]');
-    const label = oireBlock.querySelector('.mod5-oire-header');
-    if (checkbox.checked) {
-      oireet.push(label.textContent.trim());
-    }
-  });
-
-  const oireStr = oireet.join('; ');
-
-
-  // Получить текст из текстового поля
-  const extraText = mod5.querySelector('#mod5-oire-text')?.value.trim() || '';
-
-  console.log(oireet, extraText);
-
-  const response = await savePatientAlarm(oireStr, extraText);
-
-
-  if (!response || response.error) {
-    showErrorModal(newAlarmPatient, 'something went wrong, try again.', 'X Ilmoita oireista / hätätilanne');
-  }
-};
-
-const savePatientAlarm = async (oireet, userText) => {
-    const userID = localStorage.getItem('user_id');
-    try {
-        const url = `http://localhost:3000/api/ai/${userID}`;
-        const options = {
-            body: JSON.stringify({
-                status: 'warning',
-                patient_instruction: oireet,
-                doctor_note: userText
-            }),
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-        };
-
-        const response = await fetchData(url, options);
-        console.log('INSERTED ID:', response);
-        if (response) {
-            const response2 = await ahtung(response, userID, true);
-            console.log('RESPONSE 2:', response2);
-            if (response2) {
-                showMessageModal('Doctor will be notified mahdollisimman pian.', 'X Ilmoita oireista / hätätilanne');
-                return true;
-            }
-        } else {
-            return false;
-        }
-    } catch (e) {
-        console.error(e.message);
-        return false;
-    }
+    
 };
 
 const showPatSuositukset = async () => {
@@ -497,7 +442,6 @@ const addDocEventListeners = () => {
         await createNewPatient();
     });
     document.querySelectorAll('.patient-block').forEach((div) => {
-        console.log(div);
 
         const patientID = div.querySelector('.patient-block-header-id-value').textContent.trim();
 
@@ -717,7 +661,7 @@ const searchAdmUser = async () => {
 
         const response = await fetchData(url, options);
 
-        if (!response || response.error) {
+        if (!response || response.userData.error || response.error) {
             showErrorModal(admFindUser, '❗ wrong ID, try again', '🔍 Find user');
         } else {
             await admUserFound(response.userData);
@@ -728,34 +672,42 @@ const searchAdmUser = async () => {
 
 const admUserFound = async (userData) => {
     console.log('USERDATA:', userData);
-    createMod(19);
-
-    const blocks = {
-        id: await selectBlock('mod19-id-value'),
-        type: await selectBlock('mod19-type-value'),
-        name: await selectBlock('mod19-name-value'),
-        email: await selectBlock('mod19-email-value'),
-        phone: await selectBlock('mod19-phone-value'),
-        dob: await selectBlock('mod19-dob-value'),
-        dor: await selectBlock('mod19-dor-value'),
-        ht: await selectBlock('mod19-ht-value'),
-        body: await selectBlock('dia-body')
-    };
+    await createMod(19);
 
     const { userID, userEmail, userType } = userData.mainData;
     const { dateofbirth, dateofregistration, henkilotunnus, id, name, phone, surname } = userData.addData;
 
-    blocks.id.textContent = userID;
-    blocks.type.textContent = userType;
-    blocks.email.textContent = userEmail;
-    blocks.name.textContent = `${name} ${surname}`;
-    blocks.phone.textContent = phone;
-    blocks.dob.textContent = formatDate(dateofbirth);
-    blocks.dor.textContent = formatDate(dateofregistration);
-    blocks.ht.textContent = henkilotunnus;
+    const blockValues = [
+        'mod19-id-value',
+        'mod19-type-value',
+        'mod19-name-value',
+        'mod19-email-value',
+        'mod19-phone-value',
+        'mod19-dob-value',
+        'mod19-dor-value',
+        'mod19-ht-value'
+    ];
 
+    const textValues = [
+        userID,
+        userType,
+        userEmail,
+        `${name} ${surname}`,
+        phone,
+        formatDate(dateofbirth),
+        formatDate(dateofregistration),
+        henkilotunnus
+    ];
+    const blocks = await createEmptyBlocks(blockValues);
+    
+    const diaBody = await selectBlock('dia-body');
+
+    const filledBlocks = await fillBlocks(blocks, textValues);
+    
     const backButton = await createButton('mod19-back-button', 'dia-control-button', '🔍 Find another', admFindUser);
-    blocks.body.appendChild(backButton);
+    diaBody.appendChild(backButton);
+
+    
 };
 
 const createNewPatient = async () => {
@@ -775,7 +727,7 @@ const createNewPatient = async () => {
 const patData = async () => {
     createMod(14);
     const diaBody = await selectBlock('dia-body');
-    const saveButton = await createButton('new-save-button', 'dia-control-button', 'save data', userAddInfo);
+    const saveButton = await createButton('new-save-button', 'dia-control-button', '💾 save data', userAddInfo);
 
     diaBody.appendChild(saveButton);
 };
@@ -1005,33 +957,42 @@ const getPatTautihistoria = async (patID) => {
     const patientInfo = await getUserInfo(patID, 'pot');
     createMod(9);
 
-    const blocks = {
-        pot_name: await selectBlock('but-header-part-name'),
-        pot_surname: await selectBlock('but-header-part-surname'),
-        pot_mi: await selectBlock('mod9-mi-value'),
-        pot_reg: await selectBlock('mod9-reg-value'),
-        pot_pills: await selectBlock('mod9-pills-value'),
-        pot_ai: await selectBlock('mod9-ai-value'),
-        dia_body: await selectBlock('dia-body'),
-    };
-    console.log('patientINFO:', patientInfo);
-
     const patientAddInfo = await getPatAddInfo(patID);
     if (!patientAddInfo || patientAddInfo.error) {
         diaBody.textContent = 'No data found';
     }
 
+    const diaBody = await selectBlock('dia-body');
+
     const aiReports = await getFullAiResponse(patID);
 
+    const blockValues = [
+        'mod9-header-part-name',
+        'mod9-header-part-surname',
+        'mod9-mi-value',
+        'mod9-reg-value',
+        'mod9-pills-value',
+        'mod9-ai-value'
+    ];
 
-    blocks.pot_name.textContent = patientInfo.name;
-    blocks.pot_surname.textContent = patientInfo.surname;
-    blocks.pot_mi.textContent = formatDate(patientAddInfo.mi_date);
-    blocks.pot_ai.textContent = `${aiReports.length} kpl`;
-    blocks.pot_pills.textContent = patientAddInfo.pills;
-    blocks.pot_reg.textContent = formatDate(patientInfo.dateofregistration);
+    const blocks = await createEmptyBlocks(blockValues);
 
-    console.log(patientInfo);
+    console.log('BLOCKS:', blocks);
+    console.log('patientINFO:', patientInfo);
+
+    const textValues = [
+        patientInfo.name,
+        patientInfo.surname,
+        formatDate(patientAddInfo.mi_date),
+        formatDate(patientInfo.dateofregistration),
+        patientAddInfo.pills,
+        `${aiReports.length} kpl`
+    ];
+
+    const filledBlocks = await fillBlocks(blocks, textValues);
+    
+    console.log('blocks filled', filledBlocks);
+    return;
 };
 
 const getPatAddInfo = async (patID) => {
@@ -1128,4 +1089,13 @@ const attachReportNavigation = (blocks, reports) => {
     update(); // начальная отрисовка
 };
 
-export { getUsers, fillUserData, fillPatientData, addEventListenersPatient, getUserInfo, getLastAiResponse, getFullAiResponse };
+export {
+    getUsers,
+    fillUserData,
+    fillPatientData,
+    addEventListenersPatient,
+    getUserInfo,
+    getLastAiResponse,
+    getFullAiResponse,
+    getPatAddInfo
+};

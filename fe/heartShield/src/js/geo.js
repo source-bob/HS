@@ -9,10 +9,10 @@ const savePos = () => {
 
       // Сохраняем координаты в localStorage
       localStorage.setItem('userCoords', JSON.stringify(coords));
-      console.log('Геолокация сохранена:', coords);
+      console.log('Location saved in local storage:', coords);
     },
     (error) => {
-      console.error('Ошибка геолокации:', error.message);
+      console.error('Error with Geo:', error.message);
     }
   );
 };

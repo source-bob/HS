@@ -1,43 +1,41 @@
 .doc-buttons {
     width: 95%;
-    height: 12%;
-    background-color: brown;
+    height: 7%;
     margin-left: 2.5%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
 .doc-button {
-    width: 40%;
-    height: 60%;
+    width: 45%;
+    height: 80%;
+    margin-top: 0;
 }
 
 #doc-patients {
     width: 100%;
-    height: 70%;
-    border: 3px solid black;
+    height: 80%;
+    border: 5px solid black;
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
     border-radius: 1%;
+    background-color: var(--grey2);
 }
 
 .patient-block {
-    width: 94%;
-    height: 35%;
+    width: 97%;
+    height: 30%;
     margin: 2%;
-    margin-left: 3%;
     padding: 2%;
     box-sizing: border-box;
     border-radius: 1%;
-    background-color: darkolivegreen;
+    background-color: var(--grey);
 }
 
 .patient-block-header {
     width: 100%;
     height: 20%;
-    background-color: aqua;
     display: flex;
 }
 
@@ -45,48 +43,41 @@
     width: 70%;
     height: 100%;
     display: flex;
-    background-color: darkgreen;
 }
 
 .patient-block-header-status {
     width: 20%;
     min-width: 85px;
     height: 100%;
-    background-color: grey;
 }
 
 .patient-block-header-name {
     width: 78%;
     height: 100%;
     margin-left: 2%;
-    background-color: darkgrey;
 }
 
 .patient-block-header-id {
     width: 30%;
     height: 100%;
     display: flex;
-    background-color: blueviolet;
 }
 
 .patient-block-header-id-head {
     width: 80%;
     height: 100%;
     text-align: right;
-    background-color: blue;
 }
 
 .patient-block-header-id-value {
     width: 18%;
     height: 100%;
     margin-left: 2%;
-    background-color: darkblue;
 }
 
 .patient-block-hrv {
     width: 100%;
     height: 20%;
-    background-color: blue;
     display: flex;
     font-size: 90%;
 }
@@ -95,21 +86,18 @@
     width: 15%;
     height: 100%;
     text-align: right;
-    background-color: aquamarine;
 }
 
 .patient-block-hrv-value {
     width: 84%;
     height: 100%;
     margin-left: 1%;
-    background-color: aqua;
 }
 
 .patient-block-buttons {
     width: 100%;
     height: 60%;
     display: flex;
-    background-color: cadetblue;
 }
 
 .patient-block-buttons-part {
@@ -119,7 +107,7 @@
 
 .patient-block-button {
     width: 98%;
-    height: 39%;
+    height: 43%;
     margin-left: 1%;
     margin-top: 2%;
     font-size: 70%;
@@ -132,14 +120,12 @@
     flex-direction: row;
     width: 100%;
     height: 10%;
-    background-color: darkblue;
 }
 
 .alarm-dia-add-metric {
     display: flex;
     flex-direction: row;
     height: 100%;
-    background-color: green;
     min-width: 40px;
     margin-right: 2%;
 }
@@ -159,8 +145,6 @@
 
 .doc-but-header-part {
     display: flex;
-    border: 2px solid black;
-    background-color: brown;
     box-sizing: border-box;
     width: 104%;
     gap: 2%;
@@ -172,14 +156,12 @@
 
 .header-block {
     width: 15%;
-    background-color: aqua;
     min-width: 67px;
 }
 
 .data-block {
     text-align: left;
     width: 100%;
-    background-color: brown;
 }
 
 .mod8-buttons {
@@ -188,13 +170,11 @@
     width: 90%;
     display: flex;
     justify-content: space-between;
-    background-color: aquamarine;
     min-height: 35px;
 }
 
 .mod8-button {
     width: 40%;
-    background-color: blue;
 }
 
 .mod8-ai-button {
@@ -232,7 +212,6 @@
 .mod10-button {
     width: 40%;
     min-width: 100px;
-    background-color: blue;
 }
 
 .mod10-nav-button {
@@ -242,7 +221,6 @@
 .mod11-suositus-block {
     display: flex;
     width: 100%;
-    background-color: green;
 }
 
 .mod11-data-part {
@@ -253,7 +231,6 @@
 .mod11-value-row {
     margin-left: 3%;
     width: 97%;
-    background-color: blue;
     box-sizing: border-box;
     min-height: 30px;
 }
@@ -290,12 +267,12 @@
     box-sizing: border-box;
 }
 
-.mod12-row-value {
-    background-color: green;
-}
-
 #luo-uusi-pot {
     width: 100%;
+}
+
+.mod20-row-header {
+    min-width: 100px;
 }
 
 

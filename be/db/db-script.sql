@@ -84,6 +84,7 @@ CREATE TABLE alarms (
     doc_id                  INT             NOT NULL,
     pat_check               BOOLEAN         NOT NULL,
     doc_check               BOOLEAN         NOT NULL,
+    alarm_date              DATETIME        DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE,
     FOREIGN KEY (doc_id) REFERENCES doctors(id) ON DELETE CASCADE,
     FOREIGN KEY (res_id) REFERENCES ai_results(result_id) ON DELETE CASCADE
@@ -95,6 +96,18 @@ CREATE TABLE pat_data (
     mi_date                 DATE            NOT NULL,
     pills                   VARCHAR(100),
     FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE
+);
+
+CREATE TABLE pat_msg (
+    msg_id                  INT             AUTO_INCREMENT PRIMARY KEY,
+    pat_id                  INT             NOT NULL,
+    symptoms                VARCHAR(70)     NOT NULL,
+    pat_msg                 VARCHAR(150)    NOT NULL,
+    readed                  BOOLEAN         NOT NULL,
+    doc_id                  INT             NOT NULL,
+    msg_date                DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pat_id) REFERENCES patients(id) ON DELETE CASCADE,
+    FOREIGN KEY (doc_id) REFERENCES doctors(id)
 );
 
 /*all_users*/

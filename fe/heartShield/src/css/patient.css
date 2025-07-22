@@ -2,7 +2,7 @@
     width: 100%;
     height: calc(80% / 3);
     display: flex;
-    background-color: brown;
+    background-color: var(--grey);
     box-sizing: border-box;
     padding: 3%;
 }
@@ -10,21 +10,32 @@
 .patient-info-main {
     width: 50%;
     height: 100%;
-    background-color: darkmagenta;
 }
 
 .patient-info-main-block {
     width: 100%;
     height: calc(100% / 3);
-    background-color: darkred;
-    border: 1px solid black;
+    border: 1px solid var(--grey);
+    border-radius: 2%;
     box-sizing: border-box;
     display: flex;
     font-size: 90%;
 }
 
+.patient-info-main-block:nth-child(3) {
+    align-items: end;
+}
+
+.patient-info-main-block:nth-child(2) {
+    align-items: center;
+}
+
+.patient-info-main-block:nth-child(3) .sign-block,
+.patient-info-main-block:nth-child(2) .sign-block {
+    height: 50%;
+}
+
 .patient-info-main-header {
-    background-color: blueviolet;
     min-width: 95px;
 }
 
@@ -32,13 +43,11 @@
     min-width: 125px;
     max-width: 98%;
     margin-left: 2%;
-    background-color: chocolate;
 }
 
 .patient-buttons {
     width: 100%;
     height: calc(80% / 3);
-    background-color: darkblue;
     padding: 3%;
     box-sizing: border-box;
 }
@@ -46,14 +55,14 @@
 .patient-buttons-row {
     width: 100%;
     height: 50%;
-    background-color: aquamarine;
     display: flex;
     justify-content: space-between;
 }
 
 .patient-buttons-row:last-child {
-    background-color: blueviolet;
-    align-items: end;
+    height: 50%;
+    margin: 0;
+    padding: 0;
 }
 
 .patient-buttons-top {
@@ -68,10 +77,14 @@
     max-height: 50px;
 }
 
+#patient-buttons-row-id {
+    vertical-align: bottom;
+}
+
 .patient-ai {
     width: 100%;
     height: calc(80% / 3);
-    background-color: burlywood;
+    background-color: var(--grey);
     padding: 3%;
     box-sizing: border-box;
 }
@@ -79,13 +92,11 @@
 .patient-ai-header {
     width: 100%;
     height: 20%;
-    background-color: aqua;
 }
 
 .patient-ai-body {
     width: 100%;
     height: 80%;
-    background-color: brown;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -93,7 +104,6 @@
 
 #patient-ai-text {
     box-sizing: border-box;
-    background-color: aquamarine;
     margin: auto;
     max-width: 95%;
     max-height: 100%
@@ -104,14 +114,16 @@
     height: 10%;
     padding-left: 3%;
     padding-right: 3%;
+    padding-top: 3%;;
     box-sizing: border-box;
-    background-color: brown;
 }
 
 #patient-alarm-button {
     width: 100%;
     height: 100%;
-    background-color: #880015;
+    margin-bottom: 0;
+    background-color: var(--red);
+    border: 1px solid var(--red);
 }
 
 #patient-alarm-button:hover {
@@ -120,13 +132,11 @@
 
 .hrv-kaavio-row {
     width: 100%;
-    background-color: green;
     display: flex;
 }
 
 .hrv-kaavio-row-header {
     width: 35%;
-    background-color: #880015;
 }
 
 .hrv-kaavio-row-graph {
@@ -150,7 +160,6 @@
 
 .hrv-kaavio-row-value {
     width: 20%;
-    background-color: blueviolet;
     text-align: center;
 }
 
@@ -170,33 +179,22 @@
 
 #dia-mittari-status {
     margin-left: 2%;
-    background-color: #3D3D3D;
 }
 
 .alarm-block-dia {
     width: 100%;
     display: flex;
     flex-direction: row;
-    border: 2px solid black;
-    background-color: aqua;
     box-sizing: border-box;
-}
-
-.alarm-symb-block {
-    width: 5%;
-    height: 100%;
-    background-color: aliceblue;
 }
 
 .alarm-text-block {
     width: 95%;
     height: 100%;
-    background-color: #3D3D3D;
 }
 
 #alarm-button-div {
     width: 100%;
-    background-color: blue;
 }
 
 #alarm-dia-button {

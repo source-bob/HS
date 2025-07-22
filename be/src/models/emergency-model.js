@@ -1,6 +1,24 @@
 import promisePool from "../utils/database.js";
 import 'dotenv/config';
 
+const savePatientAlarm = async (alarmData) => {
+  try {
+    const doc = await getDoc(alarmData.pat_id);
+
+    const sql = `
+    INSERT INTO pat_msg (pat_id, symptoms, pat_msg, readed, doc_id)
+    VALUES (?, ?, ?, ?, ?)`;
+    const params = [alarmData.pat_id, alarmData.symptoms, alarmData.pat_msg, false, doc.doc];
+    console.log('sql:', sql);
+    console.log('params:', params);
+    const [result] = await promisePool.query(sql, params);
+    return result;
+  } catch (e) {
+    console.error('error:', e.message);
+    throw e;
+  }
+};
+
 const saveAlarmToDatabase = async (alarmData) => {
   try {
     const doc = await getDoc(alarmData.user_id);
@@ -27,6 +45,22 @@ const getDoc = async (userID) => {
     return result[0];
   } catch (e) {
     console.error('error:', e);
+  }
+};
+
+const getPatientAlarms = async (docID) => {
+  try {
+    const sql = `
+    SELECT * FROM pat_msg
+    WHERE doc_id = ?
+    AND readed = 0`;
+    const params = [docID];
+
+    const [result] = await promisePool.query(sql, params);
+    return result;
+  } catch (e) {
+    console.error('error:', e.message);
+    return;
   }
 };
 
@@ -67,4 +101,26 @@ const switchChecked = async (resID) => {
   }
 };
 
-export { saveAlarmToDatabase, checkAlarmsFromServ, switchChecked };
+const switchCheckedMsg = async (msgID) => {
+  try {
+    const sql = `
+    UPDATE pat_msg
+    SET readed = ?
+    WHERE msg_id = ?`;
+    const params = [1, msgID];
+    const [result] = await promisePool.query(sql, params);
+    return result;
+  } catch (e) {
+    console.error('error:', e);
+    throw e;
+  }
+};
+
+export {
+  getPatientAlarms,
+  savePatientAlarm,
+  saveAlarmToDatabase,
+  checkAlarmsFromServ,
+  switchChecked,
+  switchCheckedMsg
+};

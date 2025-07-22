@@ -1,4 +1,3 @@
-import { debugMovesenseCharacteristics } from "./debugBLE";
 import HRVState from './hrvState.js';
 import { monitorHRVStatus } from "./hrvAnalyzer.js";
 
@@ -171,7 +170,7 @@ function parseHeartRateWithRR(dataView) {
     console.log('↪ RR Present:', !!rrIntervalFlag);
     console.log('📦 Data byteLength:', dataView.byteLength);
 
-    // Считываем пульс
+    // Read HR
     let heartRate;
     let offset = 1;
     if (hrFormat16Bit) {
@@ -182,12 +181,12 @@ function parseHeartRateWithRR(dataView) {
         offset += 1;
     }
 
-    // Считываем RR-интервалы, если они есть
+    // Read RR 
     const rrIntervals = [];
     if (rrIntervalFlag) {
         while (offset + 1 < dataView.byteLength) {
             const rr = dataView.getUint16(offset, true);
-            rrIntervals.push(rr); // в миллисекундах
+            rrIntervals.push(rr); // ms
             offset += 2;
         }
     }
@@ -196,10 +195,10 @@ function parseHeartRateWithRR(dataView) {
 };
 
 function updateRRMetrics(newRRs) {
-    // Добавляем новые RR-интервалы
+    // Add new intervals
     rrBuffer.push(...newRRs);
 
-    // Ограничиваем буфер до последних 60 интервалов
+    // Limit buffer to 300 counts
     while (rrBuffer.length > 300) {
         rrBuffer.shift();
     }
@@ -233,16 +232,22 @@ function updateRRMetrics(newRRs) {
         console.log(`⚡ LF/HF-suhde: ${lfHfRatio}`);
     }
 
-    return { sdnn: Math.round(sdnn), rmssd: Math.round(rmssd), pnn50: Math.round(pnn50), lf_hf: parseFloat(lfHfRatio), rr_mean: Math.round(mean) };
+    return {
+        sdnn: Math.round(sdnn),
+        rmssd: Math.round(rmssd),
+        pnn50: Math.round(pnn50),
+        lf_hf: parseFloat(lfHfRatio),
+        rr_mean: Math.round(mean)
+    };
 };
 
 function calculateLFHFRatio(rrIntervals) {
     if (rrIntervals.length < 8) return null; // слишком мало точек
 
-    // 1. Нормализуем интервалы (в секундах)
+    // 1. Normalize the intervals (s)
     const rrSec = rrIntervals.map(rr => rr / 1000);
 
-    // 2. Создаем временные точки
+    // 2. Creating time points
     const timestamps = [];
     let t = 0;
     for (let i = 0; i < rrSec.length; i++) {
@@ -250,15 +255,15 @@ function calculateLFHFRatio(rrIntervals) {
         timestamps.push(t);
     }
 
-    // 3. Интерполяция данных на равномерную сетку (например, 4 Гц)
-    const fs = 4; // частота дискретизации
+    // 3. Interpolation of data onto a uniform grid (e.g., 4 Hz)
+    const fs = 4; // Sampling frequency
     const dt = 1 / fs;
     const uniformTimes = [];
     for (let i = 0; i < timestamps[timestamps.length-1]; i += dt) {
         uniformTimes.push(i);
     }
 
-    // Линейная интерполяция RR-данных
+    // Linear interpolation of RR data
     const interpolated = uniformTimes.map(t => {
         for (let i = 1; i < timestamps.length; i++) {
             if (timestamps[i] >= t) {
@@ -273,7 +278,7 @@ function calculateLFHFRatio(rrIntervals) {
         return rrSec[rrSec.length-1];
     });
 
-    // 4. Быстрое преобразование Фурье (очень базовое)
+    // 4. Fast Fourier Transform (very basic)
     const N = interpolated.length;
     const re = new Array(N).fill(0);
     const im = new Array(N).fill(0);
@@ -288,7 +293,7 @@ function calculateLFHFRatio(rrIntervals) {
 
     const powers = re.map((r, i) => r * r + im[i] * im[i]);
 
-    // 5. Определение полос энергии
+    // 5. Energy band definition
     const freqs = [];
     for (let i = 0; i < N; i++) {
         freqs.push(i * fs / N);
@@ -310,7 +315,7 @@ function calculateLFHFRatio(rrIntervals) {
 
     const lfHfRatio = lfPower / hfPower;
 
-    return lfHfRatio.toFixed(2); // округляем до 2 знаков
+    return lfHfRatio.toFixed(2); // Round to 2 decimal places
 };
 
 

@@ -31,7 +31,7 @@ const getLastMeasures = async (patId, amount) => {
   }
 };
 
-const testFunc = async () => {
+/* const testFunc = async () => {
   const patMes = await getLastMeasures(6, 1);
   const measures = patMes[0];
   const check = Object.values(measures);
@@ -42,7 +42,7 @@ const testFunc = async () => {
   console.log(keyCheck);
 };
 
-testFunc();
+testFunc(); */
 
 
 

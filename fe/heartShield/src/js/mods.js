@@ -1,7 +1,7 @@
 import { fetchData } from "./fetch";
 import { populateDeviceList } from "./mittari";
 import HRVState from "./hrvState";
-import { userType, makeModHeader } from "./mech";
+import { createShadow, modColor, userType, makeModHeader } from "./mech";
 
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -44,6 +44,7 @@ const createMod = async (number) => {
     const modHeader = document.querySelector('#dia-header-value');
 
     const userLvl = userType();
+    await modColor(1);
 
     if (number === 1) {
         makeModHeader('🧠 HRV-Kaavio');
@@ -141,6 +142,7 @@ const createMod = async (number) => {
     } else if (number === 4) {
         modBody.textContent = '';
     } else if (number === 5) {
+        modColor(2);
         modBody.innerHTML = `
         <div class="mod5" id="mod5">
             <div class="sign-block">❗</div>
@@ -177,32 +179,26 @@ const createMod = async (number) => {
         </div>`;
     } else if (number === 6) {
         console.log('mod 6');
+        modColor(2);
 
-        modHeader.textContent = 'VAROITUS - SYDÄMEN TOIMINTA POIKKEAA NORMISTA';
-        modHeader.style.color = 'white';
-        diaBody.style.backgroundColor = '#880015';
+        makeModHeader('🚨 VAROITUS - SYDÄMEN TOIMINTA POIKKEAA NORMISTA');
         closeDialogButton.style.display = 'none';
         modBody.innerHTML = `
         <div class="alarm-block-dia">
-            <div class="alarm-symb-block">1</div>
+            <div class="sign-block">❗</div>
             <div class="alarm-text-block">Mittaustesi perusteella sydämen rytmissä on havaittu kriittinen poikkeama.</div>
         </div>
         <div class="alarm-block-dia">
-            <div class="alarm-symb-block">2</div>
-            <div class="alarm-text-block">Vahvista tilasi painamalla alla olevaa painiketta 60 sekunnin kuluessa.</div>
+            <div class="sign-block">⏱️</div>
+            <div class="alarm-text-block">Vahvista tilasi painamalla alla olevaa painiketta 180 sekunnin kuluessa.</div>
         </div>
         <div class="alarm-block-dia">
-            <div class="alarm-symb-block">3</div>
-            <div class="alarm-text-block">Ellet vastaa ajoissa, järjestelmä hälyttää automaattisesti ensihoidon paikalle.</div>
-        </div>
-        <div id="alarm-button-div">
-            <button id="alarm-dia-button">Olen kunnossa</button>
+            <div class="sign-block">❗</div>
+            <div class="alarm-text-block">Ellet vastaa ajoissa, järjestelmä hälyttää automaattisesti lääkärille.</div>
         </div>
         `;
-        modBody.style.display = 'flex';
-        modBody.style.flexDirection = 'column';
     } else if (number === 7) {
-        diaBody.style.backgroundColor = '#880015';
+        await modColor(2);
         modHeader.innerHTML = `
         <div class="sign-block">🔴</div>
         <div class="mod7-dia-header">HÄTÄTILANNE - POTILAS KRIITTISESSÄ TILASSA</div>`;
@@ -285,8 +281,8 @@ const createMod = async (number) => {
             <div class="doc-but-header-part">Tautihistoria</div>
             <div class="doc-but-header-part">
                 <div class="but-header-part-part">Potilas:</div>
-                <div class="but-header-part-part" id="but-header-part-name"></div>
-                <div class="but-header-part-part" id="but-header-part-surname"></div>
+                <div class="but-header-part-part" id="mod9-header-part-name"></div>
+                <div class="but-header-part-part" id="mod9-header-part-surname"></div>
             </div>
         </div>`;
         modBody.innerHTML = `
@@ -542,15 +538,52 @@ const createMod = async (number) => {
                 <div class="mod12-row-value" id="mod19-ht-value"></div>
             </div>
         </div>`;
+    } else if (number === 20) {
+        await modColor(2);
+        modHeader.innerHTML = `
+        <div class="sign-block">⚠️</div>
+        <div class="mod7-dia-header">Potilas on lähettänyt hätäilmoituksen</div>`;
+
+        modBody.innerHTML = `
+        <div id="alarm-id"></div>
+        <div id="alarm-dia-main-info">
+            <div class="alarm-dia-main-header">Potilas:</div>
+            <div class="alarm-dia-main-name" id="alarm-dia-main-name"></div>
+        </div>
+        <div id="alarm-dia-add-info">
+            <div class="alarm-dia-add-part">
+            </div>
+            <div class="alarm-dia-add-part">
+                <div class="sign-block">🔍</div>
+                <div class="mod20-row-header">Symptoms:</div>
+                <div id="mod20-pat-symptoms-value"></div>
+            </div>
+            <div class="alarm-dia-add-part">
+                <div class="sign-block">❗</div>
+                <div class="mod20-row-header">Message:</div>
+                <div id="mod20-pat-msg-value"></div>
+            </div>
+            <div class="alarm-dia-add-part">
+                <div class="sign-block">⏱️</div>
+                <div class="mod20-row-header">Action:</div>
+                <div id="mod20-doc-action-value"></div>
+            </div>
+        </div>
+        `;
+
+        
+        console.log('mod 20');
     }
 
-    closeDialogButton.addEventListener('click', () => {
+    closeDialogButton.addEventListener('click', async () => {
         if (unsubscribe) {
             unsubscribe();
             unsubscribe = null;
         }
+        await createShadow(2);
         modWindow.close();
     });
+    await createShadow(1);
     modWindow.showModal();
 };
 
@@ -579,4 +612,8 @@ function refreshDia (body) {
 
 
 
-export { createMessage, createMod, formatDate };
+export {
+    createMessage,
+    createMod,
+    formatDate
+};
