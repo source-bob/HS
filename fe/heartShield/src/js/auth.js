@@ -57,11 +57,11 @@ const loginUser = async (event) => {
     console.log(response);
     const userType = localStorage.getItem('user_type');
     if (userType === 'adm') {
-        window.location.href = 'src/pages/admin.html';
+        window.location.href = 'admin.html';
     } else if (userType === 'pot') {
-        window.location.href = 'src/pages/patient.html';
+        window.location.href = 'patient.html';
     } else if (userType === 'doc') {
-        window.location.href = 'src/pages/doc.html';
+        window.location.href = 'doc.html';
     }
     loginForm.reset(); // tyhjennetään formi
     
