@@ -18,7 +18,7 @@ const loginUser = async (event) => {
     };
 
     // Endpoint
-    const url = 'http://localhost:3000/api/auth/login';
+    const url = 'https://hesh.northeurope.cloudapp.azure.com/api/auth/login';
 
     // Options
     const options = {

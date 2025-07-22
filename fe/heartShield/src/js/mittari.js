@@ -20,7 +20,7 @@ async function scanAvailableDevices() {
         connectedServer = server;
 
         device.addEventListener('gattserverdisconnected', async () => {
-            console.warn('🔌 Устройство отключено, пытаемся переподключиться...');
+            console.warn('🔌 Device disconnected, trying to reconnect...');
             reconnectWithRetry(device);
         });
 
@@ -47,23 +47,23 @@ let handleHRValueChanged = null;
 async function reconnectWithRetry(device, maxAttempts = 5, delay = 2000) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
-            console.log(`🔄 Попытка ${attempt} переподключения...`);
+            console.log(`🔄 and again...`);
             const server = await device.gatt.connect();
             connectedServer = server;
             await startHRVDataListener(server);
             await startRRBufferMonitor();
             if (server) {
-                console.log('✅ Успешно переподключено!', server);
+                console.log('✅ Connected', server);
             } else {
                 attempt ++;
             }
             return;
         } catch (err) {
-            console.warn(`⏳ Не удалось подключиться (попытка ${attempt}), ждём...`);
+            console.warn(`⏳ attempt failed...`);
             await new Promise(res => setTimeout(res, delay));
         }
     }
-    console.error('❌ Переподключение не удалось после всех попыток');
+    console.error('something went wrong');
 };
 
 async function populateDeviceList() {
@@ -149,14 +149,14 @@ async function startRRBufferMonitor() {
         if (rrBuffer.length >= 300) {
             clearInterval(hrvCheckInterval);
             hrvCheckInterval = null;
-            console.log("📈 Достигнута длина rrBuffer 300, запускаем анализ...");
+            console.log("📈 rrBuffer is 300 now, analisys started...");
             try {
                 await monitorHRVStatus();
             } catch (e) {
-                console.error("❌ Ошибка при анализе HRV:", e);
+                console.error("❌ Virhe HRV tarkistuksessa:", e);
             }
         } else {
-            console.log("⏳ Текущая длина rrBuffer:", rrBuffer?.length || 0);
+            console.log("⏳ Current rrBuffer:", rrBuffer?.length || 0);
         }
     }, 5000);
 };

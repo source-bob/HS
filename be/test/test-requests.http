@@ -1,4 +1,4 @@
-POST http://localhost:3000/api/auth/login/
+POST https://hesh.northeurope.cloudapp.azure.com/api/auth/login/
 Content-Type: application/json
 
 {
@@ -61,7 +61,7 @@ DELETE http://localhost:3000/api/users/30
 
 
 ###
-GET http://localhost:3000/api/users/info/11
+GET https://hesh.northeurope.cloudapp.azure.com/api/users/info/11
 
 ###
 GET http://localhost:3000/api/users/recom/6

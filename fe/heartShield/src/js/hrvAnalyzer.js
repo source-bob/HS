@@ -16,7 +16,7 @@ async function monitorHRVStatus() {
         const currentHeartRate = HRVState.getHeartRate();
 
         if (!currentStatus || !currentMetrics) {
-            console.warn('Нет данных для анализа HRV.');
+            console.warn('No data for check');
             return;
         }
 
@@ -25,7 +25,6 @@ async function monitorHRVStatus() {
         const userAge = localStorage.getItem('pat_age');
 
         if (now - lastAIRequestTimestamp >= AI_REQUEST_COOLDOWN_MS && currentStatus !== 'Normaali') {
-            console.log('SENDING METRICS TO AI, STEP 1');
             lastAIRequestTimestamp = now;
             await sendMetricsToAI(currentMetrics, userId, userAge);
             
@@ -49,7 +48,7 @@ async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
     metrics.hr = hr;
     metrics.hrv = hrv;
 
-    const url = `http://localhost:3000/api/metrics/${userId}/`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/metrics/${userId}/`;
     const options = {
         body: JSON.stringify(metrics),
         method: 'POST',
@@ -66,7 +65,7 @@ async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
 async function sendMetricsToAI(metrics, userID, age) {
 
     try {
-        const url = 'http://localhost:3000/api/ai';
+        const url = 'https://hesh.northeurope.cloudapp.azure.com/api/ai';
         const options = {
             body: JSON.stringify({
                 user_id: userID,
@@ -84,7 +83,7 @@ async function sendMetricsToAI(metrics, userID, age) {
 
         const userData = await fetchData(url, options);
 
-        console.log('🧠 Ответ ИИ:', userData);
+        console.log('🧠 AI response:', userData);
 
         
         
@@ -169,7 +168,7 @@ async function rebuildAiText(textData) {
 
 async function ahtung(insertedID, userID, answered) {
     try {
-        const url = 'http://localhost:3000/api/emergency/';
+        const url = 'https://hesh.northeurope.cloudapp.azure.com/api/emergency/';
         const options = {
             body: JSON.stringify({
                 res_id: insertedID,
@@ -197,7 +196,7 @@ async function ahtung(insertedID, userID, answered) {
 
 async function getMetric(patID) {
     try {
-        const url = `http://localhost:3000/api/metrics/${patID}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/metrics/${patID}`;
         const options = {
             method: 'GET',
             headers: {

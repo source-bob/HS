@@ -25,11 +25,11 @@ const getUsers = async () => {
     let blockTarget;
     let usersFill = false;
     if (userType === 'adm') {
-        url = 'http://localhost:3000/api/users';
+        url = 'https://hesh.northeurope.cloudapp.azure.com/api/users';
         blockTarget = '#list-of-users';
         usersFill = true;
     } else if (userType === 'doc') {
-        url = `http://localhost:3000/api/users/${localStorage.getItem('user_id')}`;
+        url = `https://hesh.northeurope.cloudapp.azure.com/api/users/${localStorage.getItem('user_id')}`;
         blockTarget = '#doc-patients';
     }
 
@@ -81,7 +81,7 @@ const countAndFillUsers = async (users) => {
 };
 
 const getPatReccomendations = async (patID) => {
-    const url = `http://localhost:3000/api/users/recom/${patID}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/recom/${patID}`;
     const options = {
         method: 'GET',
         headers: {
@@ -96,7 +96,7 @@ const getPatReccomendations = async (patID) => {
 
 const getUserInfo = async (userId, userType) => {
 
-    const url = `http://localhost:3000/api/users/${userType}/${userId}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/${userType}/${userId}`;
     const options = {
         method: 'GET',
         headers: {
@@ -111,7 +111,7 @@ const getUserInfo = async (userId, userType) => {
 };
 
 const getLastAiResponse = async (userId) => {
-    const url = `http://localhost:3000/api/ai/${userId}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/ai/${userId}`;
     const options = {
         method: 'GET',
         headers: {
@@ -125,7 +125,7 @@ const getLastAiResponse = async (userId) => {
 };
 
 const getFullAiResponse = async (userId) => {
-    const url = `http://localhost:3000/api/ai/full/${userId}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/ai/full/${userId}`;
     const options = {
         method: 'GET',
         headers: {
@@ -487,7 +487,7 @@ const saveNewRecom = async () => {
     }
     const patID = localStorage.getItem('pat_id');
     try {
-        const url = `http://localhost:3000/api/users/recom/${patID}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/recom/${patID}`;
         const options = {
             body: JSON.stringify({
                 textData: newRecomm,
@@ -543,7 +543,7 @@ const getPatSuosituksia = async () => {
 
 const deleteUserById = async (userId) => {
     try {
-        const url = `http://localhost:3000/api/users/${parseInt(userId)}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/${parseInt(userId)}`;
         const options = {
             method: 'DELETE',
             headers: {
@@ -651,7 +651,7 @@ const searchAdmUser = async () => {
     if (!userID || userID.error) {
         showErrorModal(admFindUser, '❗ wrong or empty ID', '🔍 Find user');
     } else {
-        const url = `http://localhost:3000/api/users/admin/${userID}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/admin/${userID}`;
         const options = {
             method: 'GET',
             headers: {
@@ -770,7 +770,7 @@ const userAddInfo = async () => {
 const loadAddData = async (patientData) => {
     const { id, age, mi, pills } = patientData;
     
-    const url = `http://localhost:3000/api/users/${id}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/${id}`;
     const options = {
         body: JSON.stringify({
             age: age,
@@ -819,7 +819,7 @@ const loadNewUser = async () => {
     console.log('USER DATA:', user);
 
     try {
-        const url = `http://localhost:3000/api/users/`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/`;
         const options = {
             body: JSON.stringify({
                 name: user.name,
@@ -996,7 +996,7 @@ const getPatTautihistoria = async (patID) => {
 };
 
 const getPatAddInfo = async (patID) => {
-    const url = `http://localhost:3000/api/users/info/${patID}`;
+    const url = `https://hesh.northeurope.cloudapp.azure.com/api/users/info/${patID}`;
     const options = {
         method: 'GET',
         headers: {

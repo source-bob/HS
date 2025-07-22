@@ -45,7 +45,7 @@ function alarmChecker(doc) {
 
 async function getAlarms(docID) {
     try {
-        const url = `http://localhost:3000/api/emergency/${docID}`; 
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/emergency/${docID}`; 
         const options = {
             method: 'GET',
             headers: {
@@ -71,7 +71,7 @@ async function getAlarms(docID) {
 
 async function getAlarmsMsg(docID) {
         try {
-            const url = `http://localhost:3000/api/emergency/msg/${docID}`; 
+            const url = `https://hesh.northeurope.cloudapp.azure.com/api/emergency/msg/${docID}`; 
             const options = {
                 method: 'GET',
                 headers: {
@@ -210,7 +210,7 @@ async function checkDocNotification([resID, tableID]) {
     }
 
     try {
-        const url = `http://localhost:3000/api/emergency/${urlEnd}${resID}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/emergency/${urlEnd}${resID}`;
         const options = {
             method: 'PATCH',
             headers: {
@@ -267,7 +267,7 @@ const createPatientAlarm = async () => {
 const savePatientAlarm = async (oireet, userText) => {
     const userID = localStorage.getItem('user_id');
     try {
-        const url = `http://localhost:3000/api/emergency/${userID}`;
+        const url = `https://hesh.northeurope.cloudapp.azure.com/api/emergency/${userID}`;
         const options = {
             body: JSON.stringify({
                 symptoms: oireet,
