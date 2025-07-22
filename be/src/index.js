@@ -12,12 +12,18 @@ const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
+
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/metrics', metricRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/emergency', emergencyRouter);
 
+
+app.get('*', (req, res) => {
+  res.sendFile('index.html', { root: 'public' });
+});
 
 app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
