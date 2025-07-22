@@ -313,8 +313,8 @@ heartshieldfi@gmail.com
 
 **📦 Source code:**
 
-https://github.com/source-bob/kokeilut4.git
-https://github.com/source-bob/kokeilut4/tree/master
+https://github.com/source-bob/HS.git
+https://github.com/source-bob/HS/tree/v0.1#
 
 ⏰ Support is provided within the scope of development.
 

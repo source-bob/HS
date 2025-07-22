@@ -305,8 +305,8 @@ heartshieldfi@gmail.com
 
 **📦 Исходный код:**
 
-https://github.com/source-bob/kokeilut4.git
-https://github.com/source-bob/kokeilut4/tree/master
+https://github.com/source-bob/HS.git
+https://github.com/source-bob/HS/tree/v0.1#
 
 ⏰ Поддержка осуществляется в рамках разработки.
 

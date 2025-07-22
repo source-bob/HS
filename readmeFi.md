@@ -317,8 +317,8 @@ heartshieldfi@gmail.com
 
 **📦 Lähdekoodi:**
 
-https://github.com/source-bob/kokeilut4.git
-https://github.com/source-bob/kokeilut4/tree/master
+https://github.com/source-bob/HS.git
+https://github.com/source-bob/HS/tree/v0.1#
 
 ⏰ Tuki tarjotaan osana kehitystyötä.
 
