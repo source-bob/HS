@@ -2,8 +2,8 @@ POST https://hesh.northeurope.cloudapp.azure.com/api/auth/login/
 Content-Type: application/json
 
 {
-    "user_email": "adalovelace@example.com",
-    "user_password": "adminpass"
+    "email": "adalovelace@example.com",
+    "password": "adminpass"
 }
 
 ###
@@ -64,7 +64,8 @@ DELETE http://localhost:3000/api/users/30
 GET https://hesh.northeurope.cloudapp.azure.com/api/users/info/11
 
 ###
-GET http://localhost:3000/api/users/recom/6
+GET http://hesh.northeurope.cloudapp.azure.com/api/users/recom/6
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX2VtYWlsIjoiYWRhbG92ZWxhY2VAZXhhbXBsZS5jb20iLCJ1c2VyX3R5cGUiOiJhZG0iLCJpYXQiOjE3NTMxNzk0NjksImV4cCI6MTc1MzI2NTg2OX0.DW8bvrfPl9Y5CB1je_MVXhehB4iGUlZPcehB5bM7pIU
 
 ###
 

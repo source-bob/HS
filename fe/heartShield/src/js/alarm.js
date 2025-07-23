@@ -2,7 +2,7 @@ import { fetchData } from "./fetch";
 import { createMod, formatDate } from "./mods";
 import { fillPatientData, getUserInfo } from "./users";
 import { getMetric } from "./hrvAnalyzer";
-import { getFullAiResponse, getPatAddInfo } from "./users";
+import { getFullAiResponse, getPatAddInfo, newAlarmPatient } from "./users";
 import {
     selectBlock,
     showMessageModal,

@@ -1,4 +1,19 @@
 # heartShield v0.1
+
+## Content
+
+1. Introduction
+2. System Architecture
+3. Functional Capabilities
+4. Security and Privacy
+5. Devices and Compatibility
+6. Deployment and Configuration
+7. Limitations and Future Improvements
+8. Contact Information and Support
+9. Technical Implementation
+10. Acknowledgments
+
+
 ## 1. Introduction
 ### 1.1. Purpose of the Application
 HeartShield is an intelligent application for remote monitoring of patients who have suffered a myocardial infarction. Its main goal is to reduce the risk of recurrent heart attacks by continuously tracking physiological parameters and alerting medical staff at early signs of deterioration, thereby also reducing the overall workload on healthcare professionals.
@@ -328,12 +343,14 @@ The project was developed as part of the Vaatimusmäärittely course (Metropolia
 - a — developer, project executor.
 
 **📍 Institution:**
+
 Metropolia University of Applied Sciences
 
 **🧭 Course:**
-Vaatimusmäärittely — Wellbeing and Health Technology
 
-Instructors: Matti P., Mikael S., Päivi H., Sakari L., Ulla S.
+Hyte-2025
+
+**Instructors:** Matti P., Mikael S., Päivi H., Sakari L., Ulla S.
 
 ### 8.3 Sources and Scientific Basis
 The development of the application was based on a preliminary literature review (taustakartoitus) and defined functional requirements (vaatimusmäärittely). Key ideas and conclusions:
@@ -351,6 +368,76 @@ The development of the application was based on a preliminary literature review 
 - The lack of comprehensive solutions focused on using RR intervals with connectable devices
 - The concept of using two different AI modules to improve analysis accuracy and system resilience
 
-## 9. Acknowledgments
+## 9. Technical Implementation
+### 9.1 REST API (main routes)
+#### 🔐 Authentication and Registration
+**POST /api/login** – User login (email + password)
+**POST /api/users** – Create a new user (restricted by role)
+
+#### 👤 Users and Roles
+**GET /api/users** – Get all users (admin only)
+**GET /api/users/:id** – Get patients list (doctor)
+**DELETE /api/users/:id** – Delete a user
+**GET /api/admin/:id** – Get basic user info
+**GET /api/info/:id** – Get full patient info (doctor)
+**GET /api/:status/:id** – Get user registration data
+
+#### 📊 Measurements and Analysis
+**POST /api/users/:id** – Save patient’s additional info
+**GET /api/recom/:id** – Get recommendations for patient
+**POST /api/recom/:id** – Create a recommendation
+**GET /api/metrics/:id** – Retrieve metrics from database
+**POST /api/metrics/:id** – Save patient metrics
+**POST /api/emergency** – Save a new alert
+**GET /api/emergency/:id** – Check emergency alerts (doctor)
+**POST /api/emergency/:id** – Create alert (patient)
+**PATCH /api/emergency/:id** – Mark alert as viewed
+**GET /api/emergency/msg/:id** – Get patient’s alerts
+**PATCH /api/emergency/msg/:id** – Close alert (patient)
+
+#### 🤖 AI Integration (internal route)
+**POST /api/ai** – Send data for AI analysis
+**GET /api/ai/:id** – Get latest AI response
+**POST /api/ai/:id** – Save AI response
+**GET /api/ai/full/:id** – Get full history of AI responses
+
+### 9.2 Database Structure
+**SQL script for database creation:**  
+[db-script.sql](be\db\db-script.sql)
+
+
+### 9.3 Data Structure (example)
+**Example of submitted measurement data:**
+```bash
+{
+    "sdnn": 131,
+    "rmssd": 131,
+    "pnn50": 31,
+    "lfhf": 1.31,
+    "rr_mean": 931,
+    "hr": 91,
+    "hrv": "Normal"
+}
+```
+
+**Example of AI response:***
+```bash
+{
+    "status": "warning",
+    "patient_instruction": "Continue monitoring and maintain normal activities. Contact a doctor if you experience chest pain or shortness of breath.",
+    "doctor_note": "HRV parameters (SDNN, RMSSD, pNN50) are within normal ranges. Balanced LF/HF ratio suggests stable autonomic activity. No immediate signs of acute cardiac risk based on current data."
+}
+```
+
+### 9.4 Roles and Access
+**Patient:** access to own data only
+
+**Doctor:** access to full data of assigned patients
+
+**Admin:** access to registration data of all users
+
+Registration is possible only through authorized doctors (for patients) or administrators (for doctors and admins).
+
+## 10. Acknowledgments
 The heartShield project was implemented as part of the Vaatimusmäärittely course under the academic supervision of the **lecturers** at **Metropolia University of Applied Sciences**.
 We express our gratitude for the guidance, support, and educational foundation that made this implementation possible 🌱.

@@ -1,4 +1,16 @@
 # heartShield v0.1
+## sisältö
+1. Johdanto
+2. Järjestelmän Arkkitehtuuri
+3. Toiminnalliset Ominaisuudet
+4. Tietoturva ja Tietosuoja
+5. Laitteet ja Yhteensopivuus
+6. Käyttöönotto ja Määritykset
+7. Rajoitukset ja Tulevat Kehityskohteet
+8. Yhteystiedot ja tuki
+9. Tekninen toteutus
+10. Kiitokset
+
 ## 1. Johdanto
 ### 1.1. Sovelluksen tarkoitus
 HeartShield on älykäs sovellus sydäninfarktin sairastaneiden potilaiden etäseurantaan. Sovelluksen päätavoitteena on vähentää toistuvan infarktin riskiä seuraamalla fysiologisia parametreja reaaliajassa ja varoittamalla hoitohenkilökuntaa varhaisista huononemisen merkeistä, mikä samalla keventää terveydenhuollon työkuormaa.
@@ -337,7 +349,8 @@ Metropolia Ammattikorkeakoulu
 
 **🧭 Kurssi:**
 
-Vaatimusmäärittely — Hyvinvointi- ja terveysteknologia
+Hyte-2025
+
 **Opettajat:** Matti P., Mikael S., Päivi H., Sakari L., Ulla S.
 
 ### 8.3 Lähteet ja tieteellinen perusta
@@ -356,6 +369,78 @@ Sovelluksen kehitys perustui kirjallisuuskatsaukseen (taustakartoitus) ja määr
 - Kokonaisvaltaisten RR-intervallipohjaisten ratkaisujen puute liitettäville laitteille
 - Kahden erilaisen tekoälymoduulin käyttökonsepti analyysin tarkkuuden ja vikasietoisuuden parantamiseksi
 
-## 9. Kiitokset
-HeartShield-projekti toteutettiin osana Vaatimusmäärittely-kurssia **Metropolian ammattikorkeakoulun** **opettajien** akateemisessa ohjauksessa.
+## 9. Tekninen toteutus
+### 9.1 REST API
+#### 🔐 Kirjautuminen ja rekisteröinti
+
+**POST /api/login** – Käyttäjän kirjautuminen (sähköposti + salasana)
+**POST /api/users** – Uuden käyttäjän luominen
+
+#### 👤 Käyttäjät ja roolit
+**GET /api/users** – Kaikkien käyttäjien lista (admin)
+**GET /api/users/:id** – Potilaslista (lääkäri)
+**DELETE /api/users/:id** – Käyttäjän poistaminen
+**GET /api/admin/:id** – Yleiset tiedot käyttäjästä
+**GET /api/info/:id** – Potilaan täydet tiedot (lääkäri)
+**GET /api/:status/:id** – Rekisteröintitiedot käyttäjästä
+
+#### 📊 Mittaukset ja analyysi
+**POST /api/users/:id** – Potilaan lisätietojen tallennus
+**GET /api/recom/:id** – Potilaan suosituslista
+**POST /api/recom/:id** – Uuden suosituksen luonti
+**GET /api/metrics/:id** – Potilaan mittaustiedot tietokannasta
+**POST /api/metrics/:id** – Mittausten tallennus
+**POST /api/emergency** – Uuden hälytyksen tallennus
+**GET /api/emergency/:id** – Hälytysten tarkastus (lääkäri)
+**POST /api/emergency/:id** – Potilaan hälytyksen luonti
+**PATCH /api/emergency/:id** – Hälytyksen merkitseminen luetuksi
+**GET /api/emergency/msg/:id** – Potilaan hälytysviestit
+**PATCH /api/emergency/msg/:id** – Hälytyksen sulkeminen potilaan toimesta
+
+#### 🤖 Yhteys tekoälyyn (sisäinen reitti)
+**POST /api/ai** – Potilastietojen analysointi tekoälyllä
+**GET /api/ai/:id** – Viimeisin vastaus tekoälyltä
+**POST /api/ai/:id** – Vastauksen tallennus
+**GET /api/ai/full/:id** – Kaikki tekoälyvastaukset
+
+### 9.2 Datarakenne (esimerkki)
+
+**Esimerkki mittausten lähettämisestä:**
+```bash
+{
+    "sdnn": 131,
+    "rmssd": 131,
+    "pnn50": 31,
+    "lfhf": 1.31,
+    "rr_mean": 931,
+    "hr": 91,
+    "hrv": "Normaali"
+}
+```
+
+**Esimerkki tekoälyn vastauksesta:**
+```bash
+{
+    "status": "warning",
+    "patient_instruction": "Jatka seurantaa ja ylläpidä normaalia aktiivisuutta. Ota yhteys lääkäriin, jos ilmenee rintakipua tai hengenahdistusta.",
+    "doctor_note": "HRV-parametrit (SDNN, RMSSD, pNN50) ovat normaalilla tasolla. Tasapainoinen LF/HF-suhde viittaa vakaaseen autonomiseen toimintaan. Ei akuuttia sydänriskiä tämänhetkisten tietojen perusteella."
+}
+```
+
+### 9.3 Database Structure
+**SQL script for database creation:**  
+[db-script.sql](be\db\db-script.sql)
+
+
+### 9.4 Roolit ja käyttöoikeudet
+**Potilas:** pääsy vain omiin tietoihin
+
+**Lääkäri:** pääsy omien potilaiden laajennettuihin tietoihin
+
+**Admin:** pääsy kaikkien käyttäjien rekisteritietoihin
+
+Rekisteröityminen tapahtuu vain valtuutetun lääkärin (potilas) tai järjestelmänvalvojan (lääkärit ja adminit) kautta.
+
+## 10. Kiitokset
+HeartShield-projekti toteutettiin osana Hyte-2025-kurssia **Metropolian ammattikorkeakoulun** **opettajien** akateemisessa ohjauksessa.
 Kiitämme ohjauksesta, tuesta ja opetusperustasta, jotka mahdollistivat projektin toteutuksen 🌱.

@@ -42,6 +42,11 @@ const getUsers = async () => {
 
     const users = await fetchData(url, options);
 
+    if (!users || users.length === 0) {
+        await createBlocks('No data for read', userType, blockTarget, 1);
+        return;
+    }
+
     if (users.error) {
         console.log('tapahtui virhe fetch haussa');
         return
@@ -138,11 +143,20 @@ const getFullAiResponse = async (userId) => {
     return aiResult;
 };
 
-const createBlocks = async (blocks, blockType, blockTarget) => {
+const createBlocks = async (blocks, blockType, blockTarget, empty=0) => {
     
     const blockArea = document.querySelector(blockTarget);
     blockArea.innerHTML = '';
-    
+    if (empty === 1) {
+        const emptyBlock = `
+            <div class="status-name-block">
+            </div>
+            <div class="user-id-block">
+                <div class=mod-div-message>No data for read.</div>
+            </div>`;
+        blockArea.appendChild(emptyBlock);
+        return;
+    }
     if (blockType === 'adm') {
         let statusName;
         blocks.forEach((block) => {
@@ -264,14 +278,19 @@ const fillPatientData = async () => {
 
     const userData = await getUserInfo(userIdStorage, 'pot');
     const lastAiResponse = await getLastAiResponse(userIdStorage);
-    const aiUserBlock = document.querySelector('#patient-ai-text');
     
 
     const ageValue = await getAge(userData.dateofbirth);
 
     localStorage.setItem('pat_age', ageValue);
 
-    const aiData = lastAiResponse.data.result_pat_text;
+    let aiData;
+
+    if (!lastAiResponse.data) {
+        aiData = 'no data for read at the moment, continue monitoring';
+    } else {
+        aiData = lastAiResponse.data.result_pat_text;
+    }
     
     await rebuildAiText(aiData);
 
@@ -1097,5 +1116,6 @@ export {
     getUserInfo,
     getLastAiResponse,
     getFullAiResponse,
-    getPatAddInfo
+    getPatAddInfo,
+    newAlarmPatient
 };
