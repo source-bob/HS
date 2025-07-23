@@ -317,6 +317,17 @@ const getAge = async (dateString) => {
     return age;
 };
 
+const newAlarmPatient = async () => {
+    createMod(5);
+    console.log('CREATING ALARM');
+    makeModHeader('🚨 Ilmoita oireista / hätätilanne');
+    const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', '⚠️ Ilmoittaa lääkärille', createPatientAlarm);
+    const diaBody = await selectBlock('dia-body');
+    
+    diaBody.appendChild(ilmoitusButton);
+    
+};
+
 const addEventListenersPatient = async () => {
 
     const blocks = {
@@ -344,16 +355,7 @@ const addEventListenersPatient = async () => {
     });
 };
 
-const newAlarmPatient = async () => {
-    createMod(5);
-    console.log('CREATING ALARM');
-    makeModHeader('🚨 Ilmoita oireista / hätätilanne');
-    const ilmoitusButton = await createButton('pat-alarm-doc', 'dia-control-button', '⚠️ Ilmoittaa lääkärille', createPatientAlarm);
-    const diaBody = await selectBlock('dia-body');
-    
-    diaBody.appendChild(ilmoitusButton);
-    
-};
+
 
 const showPatSuositukset = async () => {
     createMod(4);

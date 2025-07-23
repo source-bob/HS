@@ -5,10 +5,14 @@ import aiRouter from './routes/ai-router.js';
 import metricRouter from './routes/metric-router.js';
 import emergencyRouter from './routes/emergency-router.js';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
 const hostname = '127.0.0.1';
 const app = express();
 const port = 3000;
+
+
+dotenv.config();
 
 app.use(cors());
 app.use(express.json());

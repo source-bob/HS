@@ -324,4 +324,16 @@ const selectUserByStatusAndId = async (status, id) => {
   return rows[0];
 };
 
-export { getUserData, loadRecomDB, getPatientRecom, getPatAddInfo, selectUserByEmail, getAllUsers, getDocPatients, selectUserByStatusAndId, addUser, loadPatientData, deleteUserByID };
+export {
+  getUserData,
+  loadRecomDB,
+  getPatientRecom,
+  getPatAddInfo,
+  selectUserByEmail,
+  getAllUsers,
+  getDocPatients,
+  selectUserByStatusAndId,
+  addUser,
+  loadPatientData,
+  deleteUserByID
+};
