@@ -1,4 +1,5 @@
 import promisePool from "../utils/database.js";
+import 'dotenv/config';
 
 const saveMetricToDatabase = async (userId, userData) => {
   const { sdnn, rmssd, pnn50, lf_hf, rr_mean, hr, hrv } = userData;

@@ -1,4 +1,5 @@
 import promisePool from '../utils/database.js';
+import 'dotenv/config';
 
 /*const selectUserByEmailAndPassword = async (email, password) => {
   try {
