@@ -1,6 +1,12 @@
 import { fetchData } from './fetch.js';
 import { createMessage } from './mods.js';
 
+const base = import.meta.env.BASE_URL || '/'
+
+const goTo = (path) => {
+  window.location.href = base + path;
+};
+
 const loginUser = async (event) => {
     event.preventDefault();
 
@@ -18,7 +24,7 @@ const loginUser = async (event) => {
     };
 
     // Endpoint
-    const url = 'https://hesh.northeurope.cloudapp.azure.com/api/auth/login';
+    const url = 'http://127.0.0.1:3000/api/auth/login';
 
     // Options
     const options = {
@@ -57,11 +63,11 @@ const loginUser = async (event) => {
     console.log(response);
     const userType = localStorage.getItem('user_type');
     if (userType === 'adm') {
-        window.location.href = 'admin.html';
+        goTo('src/pages/admin.html');
     } else if (userType === 'pot') {
-        window.location.href = 'patient.html';
+        goTo('src/pages/patient.html');
     } else if (userType === 'doc') {
-        window.location.href = 'doc.html';
+        goTo('src/pages/doc.html');
     }
     loginForm.reset(); // tyhjennetään formi
     

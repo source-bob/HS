@@ -1,6 +1,8 @@
 import promisePool from '../utils/database.js';
 import 'dotenv/config';
 
+console.log(process);
+
 /*const selectUserByEmailAndPassword = async (email, password) => {
   try {
     const [rows] = await promisePool.query(
@@ -45,7 +47,7 @@ const selectUserByEmail = async (email) => {
     return rows[0];
   } catch (error) {
     console.error(error);
-    throw new Error('database error');
+    throw new Error('HUI');
   }
 };
 

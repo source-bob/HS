@@ -5,7 +5,7 @@ import { selectUserByEmail } from '../models/user-model.js';
 
 // user authentication (login)
 const login = async (req, res) => {
-
+  console.log('HUUUUUUUUUUUUUUUUI');
     const { email, password } = req.body;
 
     if (!email) {

@@ -23,7 +23,7 @@ Sovellus on suunnattu seuraaville käyttäjäryhmille:
 
 ### 1.3. Toiminnallisuuden lyhyt kuvaus
 HeartShield mahdollistaa:
-- Integroinnin puettavaan laitteeseen (Movesense-10) ja reaaliaikaisen tiedon vastaanoton palvelimen kautta.
+- Integroinnin puettavaan laitteeseen (MoveSense) ja reaaliaikaisen tiedon vastaanoton palvelimen kautta.
 - Sydänkohtauksen uusiutumiseen liittyvien parametrien seurannan (mukaan lukien sykevaihtelu eli HRV).
 - Ulkoisen tekoälypalvelun käytön tietojen analysointiin ja vaaratilanteiden ennustamiseen.
 - Lääkärin ja potilaan automaattisen ilmoittamisen mahdollisesta uhasta.
@@ -35,7 +35,7 @@ HeartShield on verkkosovellus lääkäreille, potilaille ja ylläpitäjille, jot
 
 **Järjestelmä sisältää:**
 
-- Potilaan, jolla on Movesense-10 -puettava laite, joka on yhteydessä selainpohjaiseen sovellukseen.
+- Potilaan, jolla on MoveSense -puettava laite, joka on yhteydessä selainpohjaiseen sovellukseen.
 - Lääkärin, joka tarkastelee potilastietoja ja hälytyksiä käyttöliittymästä.
 - Ylläpitäjän, joka hallitsee käyttäjiä.
 - Palvelinpuolen (Node.js), joka käsittelee tietoja, hoitaa todennuksen ja lähettää pyyntöjä ulkoiselle tekoälymoduulille.
@@ -114,7 +114,7 @@ sequenceDiagram;
 ### 3.1 Potilaan Käyttöliittymä
 **Laitteen yhdistäminen:**
 
-Potilas käyttää ulkoista Movesense‑10-puhevaa laitetta. Kaikki mitatut tiedot lähetetään tarvittaessa automaattisesti.
+Potilas käyttää ulkoista MoveSense-puhevaa laitetta. Kaikki mitatut tiedot lähetetään tarvittaessa automaattisesti.
 
 **Tilan näyttö:**
 
@@ -202,7 +202,7 @@ Kaikki tiedot tallennetaan relaatio­tietokantaan Ubuntu (LTS) ‑palvelimella, 
 
 ## 5. Laitteet ja Yhteensopivuus
 ### 5.1 Tuetut Puettavat Laitteet
-Tällä hetkellä heartShield-sovellus tukee vain yhtä laitetta — Movesense-10. Se on lääketieteellinen sensori, jossa on Bluetooth Low Energy (BLE) -tuki, ja se voi lähettää reaaliaikaisesti fysiologisia tietoja, kuten:
+Tällä hetkellä heartShield-sovellus tukee vain yhtä laitetta — MoveSense. Se on lääketieteellinen sensori, jossa on Bluetooth Low Energy (BLE) -tuki, ja se voi lähettää reaaliaikaisesti fysiologisia tietoja, kuten:
 
 - Syke
 - RR-välit (käytetään HRV-laskentaan)
@@ -351,7 +351,9 @@ Metropolia Ammattikorkeakoulu
 
 Hyte-2025
 
-**Opettajat:** Matti P., Mikael S., Päivi H., Sakari L., Ulla S.
+**Opettajat:** 
+
+Matti P., Mikael S., Päivi H., Sakari L., Ulla S.
 
 ### 8.3 Lähteet ja tieteellinen perusta
 Sovelluksen kehitys perustui kirjallisuuskatsaukseen (taustakartoitus) ja määriteltyihin toiminnallisiin vaatimuksiin (vaatimusmäärittely). Keskeiset ideat ja johtopäätökset:
@@ -371,36 +373,55 @@ Sovelluksen kehitys perustui kirjallisuuskatsaukseen (taustakartoitus) ja määr
 
 ## 9. Tekninen toteutus
 ### 9.1 REST API
-#### 🔐 Kirjautuminen ja rekisteröinti
+### 🔐 Kirjautuminen ja rekisteröinti
 
 **POST /api/login** – Käyttäjän kirjautuminen (sähköposti + salasana)
+
 **POST /api/users** – Uuden käyttäjän luominen
 
-#### 👤 Käyttäjät ja roolit
+### 👤 Käyttäjät ja roolit
 **GET /api/users** – Kaikkien käyttäjien lista (admin)
+
 **GET /api/users/:id** – Potilaslista (lääkäri)
+
 **DELETE /api/users/:id** – Käyttäjän poistaminen
+
 **GET /api/admin/:id** – Yleiset tiedot käyttäjästä
+
 **GET /api/info/:id** – Potilaan täydet tiedot (lääkäri)
+
 **GET /api/:status/:id** – Rekisteröintitiedot käyttäjästä
 
-#### 📊 Mittaukset ja analyysi
+### 📊 Mittaukset ja analyysi
 **POST /api/users/:id** – Potilaan lisätietojen tallennus
+
 **GET /api/recom/:id** – Potilaan suosituslista
+
 **POST /api/recom/:id** – Uuden suosituksen luonti
+
 **GET /api/metrics/:id** – Potilaan mittaustiedot tietokannasta
+
 **POST /api/metrics/:id** – Mittausten tallennus
+
 **POST /api/emergency** – Uuden hälytyksen tallennus
+
 **GET /api/emergency/:id** – Hälytysten tarkastus (lääkäri)
+
 **POST /api/emergency/:id** – Potilaan hälytyksen luonti
+
 **PATCH /api/emergency/:id** – Hälytyksen merkitseminen luetuksi
+
 **GET /api/emergency/msg/:id** – Potilaan hälytysviestit
+
 **PATCH /api/emergency/msg/:id** – Hälytyksen sulkeminen potilaan toimesta
 
-#### 🤖 Yhteys tekoälyyn (sisäinen reitti)
+### 🤖 Yhteys tekoälyyn (sisäinen reitti)
 **POST /api/ai** – Potilastietojen analysointi tekoälyllä
+
 **GET /api/ai/:id** – Viimeisin vastaus tekoälyltä
+
 **POST /api/ai/:id** – Vastauksen tallennus
+
 **GET /api/ai/full/:id** – Kaikki tekoälyvastaukset
 
 ### 9.2 Datarakenne (esimerkki)
