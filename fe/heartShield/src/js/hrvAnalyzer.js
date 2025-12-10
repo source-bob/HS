@@ -48,7 +48,7 @@ async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
     metrics.hr = hr;
     metrics.hrv = hrv;
 
-    const url = `http://127.0.0.1:3000/api/metrics/${userId}/`;
+    const url = `http://35.228.145.163:3000/api/metrics/${userId}/`;
     const options = {
         body: JSON.stringify(metrics),
         method: 'POST',
@@ -65,7 +65,7 @@ async function saveMetricsToDatabase(userId, metrics, hr, hrv) {
 async function sendMetricsToAI(metrics, userID, age) {
 
     try {
-        const url = 'http://127.0.0.1:3000/api/ai';
+        const url = 'http://35.228.145.163:3000/api/ai';
         const options = {
             body: JSON.stringify({
                 user_id: userID,
@@ -168,7 +168,7 @@ async function rebuildAiText(textData) {
 
 async function ahtung(insertedID, userID, answered) {
     try {
-        const url = 'http://127.0.0.1:3000/api/emergency/';
+        const url = 'http://35.228.145.163:3000/api/emergency/';
         const options = {
             body: JSON.stringify({
                 res_id: insertedID,
@@ -196,7 +196,7 @@ async function ahtung(insertedID, userID, answered) {
 
 async function getMetric(patID) {
     try {
-        const url = `http://127.0.0.1:3000/api/metrics/${patID}`;
+        const url = `http://35.228.145.163:3000/api/metrics/${patID}`;
         const options = {
             method: 'GET',
             headers: {
